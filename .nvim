@@ -6,6 +6,8 @@ if has('nvim')
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 	Plug 'fishbullet/deoplete-ruby', { 'do': ':UpdateRemotePlugins' }
 	Plug 'zchee/deoplete-jedi'
+  " Plug 'roxma/nvim-completion-manager'
+  " Plug 'roxma/ncm-rct-complete'
 endif
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -15,6 +17,7 @@ Plug 'critiqjo/vim-bufferline' " Enables tab-like list of buffers along top
 Plug 'Townk/vim-autoclose' " Automatic closure of parens, braces, and brackets
 Plug 'tpope/vim-commentary' " Easily (un)comment lines or blocks
 Plug 'tpope/vim-fugitive' " Git wrapper for vim
+Plug 'tpope/vim-rhubarb' " Adds GitHub specific features to vim-fugitive
 Plug 'tpope/vim-sensible' " Reasonable vim defaults
 Plug 'tpope/vim-surround' " Easily add surrounding characters to text objects
 Plug 'tpope/vim-repeat' " Make `.` work like it should
@@ -23,6 +26,7 @@ Plug 'tpope/vim-unimpaired' " Pairs of useful keymappings
 Plug 'tpope/vim-vinegar' " Improve netrw 
 Plug 'tpope/vim-rails' " Additional rails help
 Plug 'tpope/vim-dispatch' " Easily run builds and test in pop-out window
+Plug 'janko-m/vim-test' " Running tests in vim
 Plug 'mattn/emmet-vim' 
 Plug 'airblade/vim-gitgutter' " Show changes in the left gutter
 Plug 'junegunn/seoul256.vim' " A beautiful colorscheme!
@@ -60,6 +64,7 @@ endif
 " Colors and other essentials
 set number
 set hidden
+set expandtab
 set tabstop=2
 set shiftwidth=2
 set cursorline
@@ -68,6 +73,9 @@ syntax on
 colo seoul256
 let g:werewolf_day_themes = ['seoul256-light']
 let g:werewolf_night_themes = ['seoul256']
+
+" So new splits open on the right
+set splitright
 
 " Keymappings
 map <SPACE> <leader>
@@ -94,7 +102,6 @@ let &colorcolumn=join(range(80,999),",")  " Sets cols >=79 to a different color
 nmap ga <Plug>(EasyAlign)
 xmap ga <Plug>(EasyAlign)
 
-nnoremap <C-P> :FZF<CR>
 
 " Keep undos after file closes 
 set undofile
@@ -241,6 +248,7 @@ let g:tmuxline_preset = {
 	  \}
 
 " promptline configuration
+let g:promptline_theme = 'lightline'
 let g:promptline_preset = {
         \'a' : [ promptline#slices#cwd() ],
         \'b' : [ promptline#slices#vcs_branch(), promptline#slices#git_status() ],
@@ -255,18 +263,48 @@ autocmd BufWritepost *.py call Flake8()
 let g:flake8_show_in_gutter = 1
 let g:flake8_show_quickfix = 0
 
+" vim-ruby configuration
+
+autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1 
+autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+
+" ale configuration
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+nmap <silent> <leader>n <Plug>(ale_previous_wrap)
+nmap <silent> <leader>p <Plug>(ale_next_wrap)
+
+" vim-test configuration
+let test#strategy = "neovim"
+
 " GitGutter configuration
 nmap <Leader>yp <Plug>GitGutterPreviewHunk
 nmap <Leader>yr <Plug>GitGutterUndoHunk
 nmap <Leader>yu <Plug>GitGutterUndoHunk
 nmap <Leader>ys <Plug>GitGutterStageHunk
 
+" FZF configuration
+nnoremap <C-P> :FZF<CR>
+nnoremap <Leader>a :Ag<CR>
+
 " Put all neovim
 if has('nvim')
 	" Deoplete configuration
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#auto_refresh_delay = 200
+
+  " nvim-completion-manager configuration
+  " let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher'}
+
 	" Enable the use of <tab> as the autocomplete key
 	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 	inoremap <expr><s-tab> pumvisible() ? "\<c-p>" : "\<s-tab>"
+endif
+
+set mouse+=a
+if &term =~ '^xterm'
+    " tmux knows the extended mouse mode
+    set ttymouse=xterm2
 endif
