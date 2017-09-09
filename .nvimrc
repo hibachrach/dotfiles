@@ -1,3 +1,7 @@
+" -------
+" PLUGINS
+" -------
+
 call plug#begin('~/.local/share/nvim/plugged')
 
 " Enforcing sane behavior
@@ -69,7 +73,9 @@ Plug 'vimwiki/vimwiki' " A wiki in vim
 " Required vim-plug
 call plug#end()
 
-" Settings
+" --------
+" SETTINGS
+" --------
 set nocompatible            " Allow for settings that break from Vi (useless in nvim)
 set number                  " Show line numbers
 set hidden                  " Close windows without closing buffers
@@ -99,11 +105,13 @@ let &colorcolumn=join(range(80,999),",")  " Sets cols >=79 to a different color
 if has('nvim')
 	set guicursor=   " Disable cursor styling
 	set noshowcmd    " Don't show command in last line of screen
-	set nolazyredraw " We'll see...
+	set nolazyredraw " Prevents visual glitches (probably nvim + iTerm2 issue)
 endif
 
-" Keymappings
 
+" -----------
+" KEYMAPPINGS
+" -----------
 nmap <SPACE> <leader>
 vmap <SPACE> <leader>
 " Move to next buffer
@@ -143,7 +151,6 @@ endif
 " ---------------------
 " PLUGIN CONFIGURATIONS
 " ---------------------
-
 " vim-autoclose configuration
 let g:AutoCloseExpandSpace = 0 " Make iabbrev work again
 
@@ -370,7 +377,7 @@ function! UpdateSkim(status)
 endfunction
 
 
-" Vimwiki configuration
+" vimwiki configuration
 let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki',
 			\'template_path': '~/Dropbox/vimwiki/templates/',
 			\'template_default': 'default',
