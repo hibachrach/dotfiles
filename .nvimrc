@@ -1,7 +1,7 @@
 " -------
 " PLUGINS
 " -------
-
+" {{{
 call plug#begin('~/.local/share/nvim/plugged')
 
 " Enforcing sane behavior
@@ -72,10 +72,12 @@ Plug 'vimwiki/vimwiki' " A wiki in vim
 
 " Required vim-plug
 call plug#end()
+" }}}
 
 " --------
 " SETTINGS
 " --------
+" {{{
 set nocompatible            " Allow for settings that break from Vi (useless in nvim)
 set number                  " Show line numbers
 set hidden                  " Close windows without closing buffers
@@ -107,11 +109,13 @@ if has('nvim')
 	set noshowcmd    " Don't show command in last line of screen
 	set nolazyredraw " Prevents visual glitches (probably nvim + iTerm2 issue)
 endif
+" }}}
 
 
 " -----------
 " KEYMAPPINGS
 " -----------
+" {{{
 nmap <SPACE> <leader>
 vmap <SPACE> <leader>
 " Move to next buffer
@@ -147,10 +151,24 @@ if has('nvim')
 	inoremap <expr><TAB> pumvisible() ? "\<C-N>" : "\<TAB>"
 	inoremap <expr><S-TAB> pumvisible() ? "\<C-P>" : "\<S-TAB>"
 endif
+" }}}
+
+
+" ----------------------------------------
+" LANGUAGE SPECIFFIC MAPPINGS/AUTOCOMMANDS
+" ----------------------------------------
+" {{{
+augroup filetype_markdown
+  autocmd!
+  autocmd FileType markdown set spell
+augroup END
+" }}}
+
 
 " ---------------------
 " PLUGIN CONFIGURATIONS
 " ---------------------
+" {{{
 " vim-autoclose configuration
 let g:AutoCloseExpandSpace = 0 " Make iabbrev work again
 
@@ -384,3 +402,4 @@ let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki',
 			\'template_ext': '.html',
 			\'auto_export': 1,
 			\'auto_toc': 0}]
+" }}}
