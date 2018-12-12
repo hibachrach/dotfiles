@@ -2,26 +2,32 @@
 " PLUGINS
 " -------
 " {{{
-call plug#begin('~/.local/share/nvim/plugged')
+if has('nvim')
+  call plug#begin('~/.local/share/nvim/plugged')
+else
+  call plug#begin('~/.vim/plugged')
+endif
 
 " Enforcing sane behavior
-Plug 'tpope/vim-sensible'    " Reasonable vim defaults
-Plug 'tpope/vim-repeat'      " Make `.` work like it should
-Plug 'tpope/vim-endwise'     " Automatically add `end` when in Ruby
-Plug 'Townk/vim-autoclose'   " Automatic closure of parens, braces, and brackets
-Plug 'timakro/vim-searchant' " Highlight *all* of the matches in a search
+Plug 'tpope/vim-sensible'            " Reasonable vim defaults
+Plug 'tpope/vim-repeat'              " Make `.` work like it should
+Plug 'tpope/vim-endwise'             " Automatically add `end` when in Ruby
+Plug 'Townk/vim-autoclose'           " Automatic closure of parens, braces, and brackets
+Plug '~/personal/traces.vim'         " Highlight patterns and ranges for Ex-commands
 
 " UI - Plugins that don't *do* anything but display information
 Plug 'critiqjo/vim-bufferline' " Enables tab-like list of buffers along top
 Plug 'itchyny/lightline.vim'   " Extensible lightweight statusbar for vim
-Plug 'junegunn/seoul256.vim'   " A beautiful colorscheme!
 Plug 'junegunn/vim-peekaboo'   " To see vim register contents during reg access
+Plug 'machakann/vim-highlightedyank' " Make the yanked region apparent!
+
+" Colorschemes
+Plug '~/personal/programming/seoul256.vim'
 
 " File Navigation
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'   " Fuzzy file search (hooked up to C-P for me)
-Plug 'majutsushi/tagbar'  " Show sidebar of tags a la IntelliJ or Eclipse
-Plug 'mhinz/vim-startify' " Show useful menu on vim's startup
+Plug 'mileszs/ack.vim'    " Support Ag under Ack command with quickfix list integration
 
 " Editor Keybindings/Motions
 Plug 'tpope/vim-unimpaired'       " Pairs of useful keymappings
@@ -29,21 +35,30 @@ Plug 'tpope/vim-commentary'       " Easily (un)comment lines or blocks
 Plug 'wellle/targets.vim'         " Add additional text objects and related goodies
 Plug 'junegunn/vim-easy-align'    " To easily align repeating structures
 Plug 'tpope/vim-surround'         " Easily add surrounding characters to text objects
-Plug 'tweekmonster/braceless.vim' " Manipulate blocks in indented languages
+Plug 'AndrewRadev/splitjoin.vim'  " Easily transition between one-line & multiline statements
+Plug 'tpope/vim-projectionist'
+
+" Advanced text manipulation
+Plug 'tpope/vim-abolish' " Case-smart replacement; case coercion
+Plug 'kana/vim-textobj-user'
 
 " Interfaces
 Plug 'tpope/vim-eunuch'               " Adds nice Unix shortcuts to Vim
 Plug 'tpope/vim-fugitive'             " Git wrapper for vim
-Plug 'tpope/vim-rhubarb'              " Adds GitHub specific features to vim-fugitive
+Plug 'tpope/vim-rhubarb'              " GitHub wrapper for vim
 Plug 'janko-m/vim-test'               " Running tests in vim
 Plug 'benmills/vimux'                 " Send commands to tmux panes from vim; used in vim-test
 Plug 'airblade/vim-gitgutter'         " Show changes in the left gutter; stage individual hunks
 Plug 'christoomey/vim-tmux-navigator' " Enables vim-tmux nav with C-h/j/k/l keys
-Plug 'rizzatti/dash.vim'
-Plug 'wsdjeg/vim-cheat'               " Open ~/.cheat/ files easily in vim
+Plug 'jpalardy/vim-slime'             " Send commands over to another tmux pane!
 
+ 
 " Autocompletion
 if has('nvim')
+  " Plug 'autozimu/LanguageClient-neovim', {
+  "     \ 'branch': 'next',
+  "     \ 'do': 'bash install.sh',
+  "     \ }
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 endif
 
@@ -52,23 +67,41 @@ Plug 'edkolev/tmuxline.vim' " Customize tmux status bar in .vimrc
 Plug 'edkolev/promptline.vim' " Customize shell prompt
 
 " Language/library specific plugins
-Plug 'sheerun/vim-polyglot'
-Plug 'w0rp/ale' " Asynchronous linter
-Plug 'vim-ruby/vim-ruby'
-Plug 'tpope/vim-rails' " Additional rails help
-Plug 'pangloss/vim-javascript'
-Plug 'fs111/pydoc.vim' 
-Plug 'vim-scripts/django.vim'
-Plug 'hail2u/vim-css3-syntax'
-Plug 'lervag/vimtex' " Vim plugin for working with .tex files
-Plug 'mattn/emmet-vim' " Easily input raw HTML
+" Plug 'sheerun/vim-polyglot'
+Plug '~/personal/programming/forks/ale'                     " Asynchronous linter
+Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
+Plug 'tpope/vim-rails'              " Additional rails help
+Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
+Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
+" Language/library specific plugins that I do not actively use
+" For one reason or another, I don't code actively in these languages.
+" However, I have found these useful when coding _in_ said languages
+
+Plug 'slim-template/vim-slim', { 'for': 'slim' }
+Plug 'digitaltoad/vim-pug', { 'for': ['vue', 'pug']}
+Plug 'posva/vim-vue', { 'for': 'vue' }
+Plug 'rhysd/vim-crystal'
+Plug 'ElmCast/elm-vim', { 'for': 'elm' }
+Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+Plug 'mxw/vim-jsx', { 'for': 'jsx' }  " React/JSX syntax highlighting/indenting
+" Plug 'HerringtonDarkholme/yats.vim' " yet-another-typescript-syntax
+" Plug 'fs111/pydoc.vim' 
+" Plug 'zah/nim.vim'                  " Nim language support for [n]vim
+Plug 'lervag/vimtex', { 'for': 'tex' }                " Vim plugin for working with .tex files
 if has('nvim')
-	Plug 'fishbullet/deoplete-ruby', { 'do': ':UpdateRemotePlugins' }
-	Plug 'zchee/deoplete-jedi'
+"   Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
+" 	Plug 'zchee/deoplete-jedi'
+"   Plug 'vim-python/python-syntax'
+"   Plug 'mhartington/nvim-typescript', { 'do': ':UpdateRemotePlugins' }
+  Plug 'tweekmonster/deoplete-clang2'
+  Plug '~/personal/programming/forks/deoplete-crystal', { 'for': 'crystal' }
+  Plug 'racer-rust/vim-racer', { 'for': 'rust' }
 endif
 
 " Misc. 
-Plug 'vimwiki/vimwiki' " A wiki in vim
+" Plug 'vimwiki/vimwiki' " A wiki in vim
+Plug 'tpope/vim-dispatch' " Run :make async, with tmux support
+Plug 'tweekmonster/startuptime.vim'
 
 " Required vim-plug
 call plug#end()
@@ -78,8 +111,10 @@ call plug#end()
 " SETTINGS
 " --------
 " {{{
-set nocompatible            " Allow for settings that break from Vi (useless in nvim)
+filetype on
 set number                  " Show line numbers
+set spelllang=en
+set spell                   " Spellcheck (in comments & strings)
 set hidden                  " Close windows without closing buffers
 set expandtab               " Expand each press of <TAB> to appropriate number of spaces
 set tabstop=2               " Number of spaces each tab corresponds to
@@ -93,21 +128,42 @@ set undofile                " Keep undos in a file
 set undodir=$HOME/.vim/undo " Sets undo file director
 set undolevels=1000         " Max number of changes that can be undone
 set undoreload=10000        " Save files <10,000 lines as an undo before executing :e!
+set noswapfile              " Swap files aren't really necessary with git and undofiles
 set showtabline=2           " Always show tab list; utilized by bufferline to show buffers
+set cmdwinheight=1
 set mouse+=a
+set shell=zsh\ --login
 if &term =~ '^xterm'
     " tmux knows the extended mouse mode
     set ttymouse=xterm2
 endif
 
+" if has('termguicolors')
+"   set termguicolors " 24 bit terminal
+" endif
+
+
+" endif
+" let g:seoul256_background = 235
 colorscheme seoul256
 let &colorcolumn=join(range(80,999),",")  " Sets cols >=79 to a different color
 
+if executable('ripgrep')
+  " Use ripgrep over grep
+  set grepprg=rg\ --vimgrep\ --no-heading
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
+elseif executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --vimgrep\ $*
+  set grepformat=%f:%l:%c:%m
+endif
+
 " Neovim specific items
 if has('nvim')
-	set guicursor=   " Disable cursor styling
-	set noshowcmd    " Don't show command in last line of screen
-	set nolazyredraw " Prevents visual glitches (probably nvim + iTerm2 issue)
+  set inccommand=nosplit " Show replaced string *while* typing!
+	set guicursor=         " Disable cursor styling
+	set noshowcmd          " Don't show command in last line of screen
+	set nolazyredraw       " Prevents visual glitches (probably nvim + iTerm2 issue)
 endif
 " }}}
 
@@ -119,14 +175,15 @@ endif
 nmap <SPACE> <leader>
 vmap <SPACE> <leader>
 " Move to next buffer
-nmap <leader>l :bnext<CR>
+nnoremap <leader>l :bnext<CR>
 " Move to previous buffer
-nmap <leader>h :bprevious<CR>
+nnoremap <leader>h :bprevious<CR>
 " Close current buffer and move to previous
-nmap <leader>w :bp <BAR> bd #<CR>
+nnoremap <leader>w :bp <BAR> bd #<CR>
 " Easily edit .[n]vimrc
 nnoremap <leader>ve :vsplit $MYVIMRC<CR>
 nnoremap <leader>vs :source $MYVIMRC<CR>
+nnoremap <leader>ze :vsplit ~/.zshrc<CR>
 " Navigate based on visual line breaks
 nnoremap j gj
 nnoremap k gk
@@ -137,20 +194,42 @@ inoremap jj <Esc>l
 cnoremap jj <C-c>l
 " Escape from visual mode using `v`
 vnoremap v <Esc>
-nnoremap <C-J> <C-W>j<C-W>_ 
-nnoremap <C-K> <C-W>k<C-W>_
 nnoremap <leader>k 10k
 nnoremap <leader>j 10j
 vnoremap <leader>k 10k
 vnoremap <leader>j 10j
 " Make Y work like it's supposed to
 nnoremap Y y$
+" Clear highlighting from last search
+nnoremap <C-C> :noh<CR>
+" Make n always go down and N always go up in a file
+noremap <expr> n (v:searchforward ? 'n' : 'N')
+noremap <expr> N (v:searchforward ? 'N' : 'n')
+
+" Find and replace word under cursor
+nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
+
+nnoremap <Leader>u :cp<CR>
+nnoremap <Leader>o :cn<CR>
+
+" Use a vim-buffer-like pane for executing commands 
+nnoremap : q:i
 
 if has('nvim')
 	" Use `<TAB>` to scroll through pop-up menu
 	inoremap <expr><TAB> pumvisible() ? "\<C-N>" : "\<TAB>"
 	inoremap <expr><S-TAB> pumvisible() ? "\<C-P>" : "\<S-TAB>"
 endif
+" }}}
+
+
+" -----------
+" COMMANDS
+" -----------
+" {{{
+" Wrapping cnext/cprev!
+command! Cnext try | cnext | catch | cfirst | catch | endtry
+command! Cprev try | cprev | catch | clast | catch | endtry
 " }}}
 
 
@@ -161,6 +240,25 @@ endif
 augroup filetype_markdown
   autocmd!
   autocmd FileType markdown set spell
+  autocmd Filetype markdown set textwidth=80
+  autocmd Filetype markdown set colorcolumn=+1,+2
+  autocmd BufWritePost *.md silent! Make!
+augroup END
+
+augroup filetype_typescript
+  autocmd!
+  autocmd BufWritePost *.ts silent! Make!
+augroup END
+
+augroup filetype_coffeescript
+  autocmd!
+  autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+augroup END
+
+augroup filetype_ruby
+  autocmd!
+  autocmd Filetype ruby iabbrev dbp Rails.logger.info("##### DEBUG #{}")<Left><Left><Left>
+  autocmd Filetype ruby iabbrev dbd require 'pry'; binding.pry
 augroup END
 " }}}
 
@@ -169,6 +267,12 @@ augroup END
 " PLUGIN CONFIGURATIONS
 " ---------------------
 " {{{
+" vim-highlightedyank configuration
+if !has('nvim')
+  map y <Plug>(highlightedyank)
+endif
+
+
 " vim-autoclose configuration
 let g:AutoCloseExpandSpace = 0 " Make iabbrev work again
 
@@ -177,12 +281,12 @@ let g:AutoCloseExpandSpace = 0 " Make iabbrev work again
 let g:bufferline_active_buffer_left = ''
 let g:bufferline_active_buffer_right = ''
 let g:bufferline_show_bufnr = 0
-let g:bufferline_fname_mod = ':~:.'
+let g:bufferline_fname_mod = ':~:.' " Make filename rel to home or cur directory
 let g:bufferline_pathshorten = 1
 
-function! MyBufferlineRefresh()
+function! BufferlineRefresh()
 	call bufferline#refresh_status()
-	let rlen = 4*tabpagenr('$') + len(&fenc) + 8
+	let rlen = 4*tabpagenr('$') + 8
 	call bufferline#trim_status_info(&columns - rlen)
 	return ''
 endfunction
@@ -192,7 +296,7 @@ endfunction
 let g:lightline = {
 			\  'colorscheme': 'seoul256',
 			\  'active':{
-			\		'left': [ [ 'mode', 'paste' ], ['fugitive', 'filename'], ['ctrlpmark'] ],
+			\		'left': [ [ 'mode', 'paste' ], [], ['filename', 'linterstatus'] ],
 			\		'right': [ ['lineinfo' ] , ['filetype'], ['fileencoding'], ]
 			\  },
 			\  'tab': {
@@ -201,24 +305,19 @@ let g:lightline = {
 			\  },
 			\  'tabline': {
 			\ 	 	'left': [ ['tabs'], ['bufferline'] ],
-			\  		'right': [ ['fileencoding'] ]
+			\  		'right': []
 			\  },
 			\  'component': {
-			\		'readonly': '%{&readonly?"⭤ ":""}',
-			\   	'bufferline': '%{MyBufferlineRefresh()}' . bufferline#get_status_string('TabLineSel', 'LightLineLeft_tabline_tabsel_1'),
+      \		  'readonly': '%{&readonly?"RO":""}',
+      \   	'bufferline': '%{BufferlineRefresh()}' . bufferline#get_status_string('TabLineSel', 'LightLineLeft_tabline_tabsel_1'),
 			\   	'fileencoding': '%{&fenc}',
 			\  },
 			\  'component_function': {
 			\		'ctrlpmark': 'CtrlPMark',
-			\		'fugitive': 'LightLineFugitive',
-			\		'filename': 'LightLineFilename',
-      \   'mode': 'LightLineMode'
-			\  		},
+      \   'linterstatus': 'LightlineLinterStatus',
+      \   'mode': 'LightLineMode',
+			\  	},
 			\ }
-let lightline.enable = {
-			\ 'statusline': 1,
-			\ 'tabline': 1
-			\}
 
 function! LightLineFileformat()
 	return winwidth(0) > 70 ? &fileformat : ''
@@ -233,37 +332,58 @@ function! LightLineFileencoding()
 endfunction
 
 function! LightLineMode()
-	let fname = expand('%:t')
-	return fname == '__Tagbar__' ? 'Tagbar' :
-				\ fname == 'ControlP' ? 'CtrlP' :
-				\ fname == '__Gundo__' ? 'Gundo' :
-				\ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
-				\ fname =~ 'NERD_tree' ? 'NERDTree' :
-				\ &ft == 'unite' ? 'Unite' :
-				\ &ft == 'vimfiler' ? 'VimFiler' :
-				\ &ft == 'vimshell' ? 'VimShell' :
-				\ winwidth(0) > 60 ? lightline#mode() : ''
+	return  winwidth(0) > 60 ? lightline#mode() : ''
 endfunction
 
-function! LightLineFugitive()
+function! LightLineGitBranch()
 	try
-		if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
-			let mark = ''  " edit here for cool mark
-			let _ = fugitive#head()
-			return _ !=# '' ? mark._ : ''
+		if exists('*fugitive#head')
+			let branchname = fugitive#head()
+			return branchname !=# '' ? branchname : ''
 		endif
 	catch
 	endtry
 	return ''
 endfunction
 
+function! LightlineLinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
+
+    let l:all_errors = l:counts.error + l:counts.style_error
+    let l:all_non_errors = l:counts.total - l:all_errors
+
+    return l:counts.total == 0 ? 'OK' : printf(
+    \   '%dW %dE',
+    \   all_non_errors,
+    \   all_errors
+    \)
+endfunction
+
 
 " fzf.vim configuration
-nnoremap <C-P> :FZF<CR>
+" ensure fzf respects .gitignore
+let $FZF_DEFAULT_COMMAND ='ag -g ""'
 nnoremap <Leader>a :Ag<CR>
 nnoremap <Leader>b :Buffers<CR>
-nnoremap <C-M> :Buffers<CR>
 nnoremap <C-N> :Lines<CR>
+nnoremap <C-P> :Files<CR>
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+nnoremap <Leader>r :Rg<CR>
+
+
+" ag.vim configuration
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
+
+" targets.vim configuration
+let g:targets_argOpening = '[({[]'
+let g:targets_argClosing = '[]})]'
 
 
 " vim-easy-align configuration
@@ -273,17 +393,21 @@ xmap ga <Plug>(EasyAlign)
 let g:easy_align_delimiters = { ';': { 'pattern': ':', 'left_margin': 1, 'right_margin': 0 } }
 
 
-" braceless configuration
-autocmd FileType haml,coffee BracelessEnable +indent
-
-
 " vim-fugitive configuration
 nnoremap <Leader>gw :Gwrite<CR>
 nnoremap <Leader>gs :Gstatus<CR>
 nnoremap <Leader>gc :Gcommit<CR>
-nnoremap <Leader>ga :Gcommit --amend<CR>
 nnoremap <Leader>gp :Gpush<CR>
 nnoremap <Leader>gfp :Gpush -f<CR>
+
+
+" vim-projectionist configuration
+let g:projectionist_heuristics = {
+  \ '*.cr': {
+  \   'src/*.cr': { 'alternate': 'spec/{}_spec.cr' },
+  \   'spec/*_spec.cr': { 'alternate': 'src/{}.cr' }
+  \  }
+  \}
 
 
 " vim-test configuration
@@ -295,20 +419,48 @@ nnoremap <Leader>tf :TestFile<CR>
 
 
 " vimux configuration
-let VimuxUseNearest = 0
+let VimuxUseNearest = 1
 
 
 " vim-gitgutter configuration
+set updatetime=100
 nmap <Leader>yp <Plug>GitGutterPreviewHunk
-nmap <Leader>yr <Plug>GitGutterUndoHunk
 nmap <Leader>yu <Plug>GitGutterUndoHunk
 nmap <Leader>ys <Plug>GitGutterStageHunk
 
 
+" vim-slime configuration
+if ($TMUX !=# "")
+  let g:slime_default_config = { 'socket_name': split($TMUX, ',')[0], 'target_pane': ':.2' }
+  let g:slime_target = "tmux"
+  let g:slime_past_file = "$HOME/.slime_paste"
+  let g:slime_no_mappings = 1
+  xmap <c-s><c-s> <Plug>SlimeRegionSend
+  nmap <c-s><c-s> <Plug>SlimeParagraphSend
+  nmap <c-s>v     <Plug>SlimeConfig
+endif
+
+
+" LanguageClient-neovim configuration
+let g:LanguageClient_serverCommands = {
+    \ 'ruby': ['solargraph', 'stdio'],
+    \ }
+
+
 " deoplete configuration
 if has('nvim')
+  " let g:deoplete#omni#functions = {}
+  " let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
+  " let g:deoplete#omni#functions.haml = g:deoplete#omni#functions.ruby
+  " let g:deoplete#omni#input_patterns = {}
+  " let g:deoplete#omni#input_patterns.ruby = ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::']
+  " let g:deoplete#omni#input_patterns.haml = g:deoplete#omni#input_patterns.ruby
+  " let g:deoplete#complete_method = 'omnifunc'
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#auto_refresh_delay = 200
+  let g:deoplete#sources#crystal#lib = '/Users/harry/source-dirs/crystal/src'
+  let g:deoplete#sources#crystal#bin = '/Users/harry/path_dependencies/cracker'
+  let g:deoplete#enable_profile = 1
 endif
 
 
@@ -337,18 +489,36 @@ let g:promptline_powerline_symbols = 0
 
 
 " polyglot configuration
-let g:polyglot_disabled = ['latex'] " To ensure compatiblility with vimtex
+let g:polyglot_disabled = ['latex', 'jsx', 'conf'] " To ensure compatiblility with vimtex
 
 " ale configuration
 nmap <silent> <leader>n <Plug>(ale_previous_wrap)
 nmap <silent> <leader>p <Plug>(ale_next_wrap)
+nmap <silent> <leader>f <Plug>(ale_fix)
+nmap <silent> <leader>i <Plug>(ale_detail)
 
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%] [%code%]'
+" let g:ale_ruby_rubocop_executable = 'bundle'
 let g:ale_fixers = {
 \   'ruby': [
 \       'rubocop'
+\   ],
+\   'python': [
+\       'yapf'
+\   ],
+\   'jsx': [
+\       'eslint'
+\   ],
+\   'html': [
+\       'tidy'
+\   ],
+\   'xml': [
+\       'tidy'
+\   ],
+\   'svg': [
+\       'tidy'
 \   ],
 \}
 
@@ -393,6 +563,19 @@ function! UpdateSkim(status)
 		call system(join(l:cmd + [line('.'), shellescape(l:out)], ' '))
 	endif
 endfunction
+
+
+" " deoplete-ternjs configuration
+" let g:deoplete#sources#ternjs#filteypes = [
+"   \ 'jsx',
+"   \ 'javascript.jsx',
+"   \ 'vue',
+"   \ 'coffee'
+"   \ ]
+
+
+" " python-syntax configuration
+" let g:python_highlight_all = 1
 
 
 " vimwiki configuration
