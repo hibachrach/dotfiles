@@ -73,6 +73,7 @@ Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'tpope/vim-rails'              " Additional rails help
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
+Plug 'junegunn/vader.vim', { 'for': 'vader' }
 " Language/library specific plugins that I do not actively use
 " For one reason or another, I don't code actively in these languages.
 " However, I have found these useful when coding _in_ said languages
