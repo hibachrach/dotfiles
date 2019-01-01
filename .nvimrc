@@ -260,6 +260,11 @@ augroup filetype_ruby
   autocmd Filetype ruby iabbrev dbp Rails.logger.info("##### DEBUG #{}")<Left><Left><Left>
   autocmd Filetype ruby iabbrev dbd require 'pry'; binding.pry
 augroup END
+
+augroup filetype_rust
+  autocmd!
+  autocmd Filetype rust nmap gd <Plug>(rust-def)
+augroup END
 " }}}
 
 
@@ -563,6 +568,10 @@ function! UpdateSkim(status)
 		call system(join(l:cmd + [line('.'), shellescape(l:out)], ' '))
 	endif
 endfunction
+
+
+" rust.vim configuration
+let g:rustfmt_autosave = 1
 
 
 " " deoplete-ternjs configuration
