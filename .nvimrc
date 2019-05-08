@@ -53,6 +53,7 @@ Plug 'benmills/vimux'                 " Send commands to tmux panes from vim; us
 Plug 'airblade/vim-gitgutter'         " Show changes in the left gutter; stage individual hunks
 Plug 'christoomey/vim-tmux-navigator' " Enables vim-tmux nav with C-h/j/k/l keys
 Plug 'jpalardy/vim-slime'             " Send commands over to another tmux pane!
+Plug 'rizzatti/dash.vim'              " Query Dash.app from vim
 
  
 " Autocompletion
@@ -160,6 +161,7 @@ elseif executable('ag')
   set grepprg=ag\ --vimgrep\ $*
   set grepformat=%f:%l:%c:%m
 endif
+set keywordprg=:Dash!
 
 " Neovim specific items
 if has('nvim')
@@ -453,6 +455,10 @@ if ($TMUX !=# "")
 endif
 
 
+" dash.vimm configuration
+let g:dash_activate = 0 " Don't switch app focus to Dash
+
+
 " LanguageClient-neovim configuration
 let g:LanguageClient_serverCommands = {
     \ 'ruby': ['solargraph', 'stdio'],
@@ -539,6 +545,8 @@ let g:ale_fixers = {
 autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1 
 autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
 autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+" Need this to override `ri`.
+autocmd FileType ruby,eruby,haml set keywordprg=:Dash!
 
 
 " vimtex configuration
