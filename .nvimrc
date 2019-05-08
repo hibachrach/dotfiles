@@ -216,6 +216,27 @@ nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
 nnoremap <Leader>u :cp<CR>
 nnoremap <Leader>o :cn<CR>
+nnoremap <silent> s :set operatorfunc=AgFromMotion<cr>g@
+vnoremap <silent> s :<C-U>call AgFromMotion(visualmode(), 1)<cr>
+
+function! AgFromMotion(type, ...)
+  let sel_save = &selection
+  let &selection = "inclusive"
+  let reg_save = @@
+
+  if a:0  " Invoked from Visual mode, use gv command.
+    silent exe "normal! gvy"
+  elseif a:type == 'line'
+    silent exe "normal! '[V']y"
+  else
+    silent exe "normal! `[v`]y"
+  endif
+
+  exe ":AgIgnoreFilename " . @"
+
+  let &selection = sel_save
+  let @@ = reg_save
+endfunction
 
 " Use a vim-buffer-like pane for executing commands 
 nnoremap : q:i
@@ -377,7 +398,9 @@ let g:Hexokinase_virtualText = '███'
 " fzf.vim configuration
 " ensure fzf respects .gitignore
 let $FZF_DEFAULT_COMMAND ='ag -g ""'
+command! -bang -nargs=* AgIgnoreFilename call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
 nnoremap <Leader>a :Ag<CR>
+nnoremap <Leader>e :AgIgnoreFilename<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <C-N> :Lines<CR>
 nnoremap <C-P> :Files<CR>
