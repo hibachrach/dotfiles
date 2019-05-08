@@ -37,6 +37,7 @@ Plug 'wellle/targets.vim'         " Add additional text objects and related good
 Plug 'junegunn/vim-easy-align'    " To easily align repeating structures
 Plug 'tpope/vim-surround'         " Easily add surrounding characters to text objects
 Plug 'AndrewRadev/splitjoin.vim'  " Easily transition between one-line & multiline statements
+Plug 'AndrewRadev/switch.vim'     " Easily switch between states/formats for various things
 Plug 'tpope/vim-projectionist'
 
 " Advanced text manipulation
