@@ -268,6 +268,7 @@ augroup filetype_markdown
   autocmd FileType markdown set spell
   autocmd Filetype markdown set textwidth=80
   autocmd Filetype markdown set colorcolumn=+1,+2
+  autocmd Filetype markdown iabbrev -> →
   autocmd BufWritePost *.md silent! Make!
 augroup END
 
