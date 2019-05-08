@@ -20,6 +20,7 @@ Plug 'critiqjo/vim-bufferline' " Enables tab-like list of buffers along top
 Plug 'itchyny/lightline.vim'   " Extensible lightweight statusbar for vim
 Plug 'junegunn/vim-peekaboo'   " To see vim register contents during reg access
 Plug 'machakann/vim-highlightedyank' " Make the yanked region apparent!
+Plug 'RRethy/vim-hexokinase' " Show colors for hexcodes in sign column
 
 " Colorschemes
 Plug '~/personal/programming/seoul256.vim'
@@ -364,6 +365,10 @@ function! LightlineLinterStatus() abort
     \   all_errors
     \)
 endfunction
+
+
+" vim-hexokinase configuration
+let g:Hexokinase_virtualText = '███'
 
 
 " fzf.vim configuration
