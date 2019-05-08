@@ -148,8 +148,7 @@ if has('termguicolors')
 endif
 
 
-" endif
-" let g:seoul256_background = 235
+let g:seoul256_background = 235
 colorscheme seoul256
 let &colorcolumn=join(range(80,999),",")  " Sets cols >=79 to a different color
 
