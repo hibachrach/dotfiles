@@ -138,7 +138,7 @@ set showtabline=2           " Always show tab list; utilized by bufferline to sh
 set cmdwinheight=1
 set mouse+=a
 set shell=zsh\ --login
-if &term =~ '^xterm'
+if &term =~ '^xterm' && !has('nvim')
     " tmux knows the extended mouse mode
     set ttymouse=xterm2
 endif
