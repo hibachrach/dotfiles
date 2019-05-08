@@ -143,9 +143,9 @@ if &term =~ '^xterm' && !has('nvim')
     set ttymouse=xterm2
 endif
 
-" if has('termguicolors')
-"   set termguicolors " 24 bit terminal
-" endif
+if has('termguicolors')
+  set termguicolors " 24 bit terminal
+endif
 
 
 " endif
