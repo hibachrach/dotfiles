@@ -577,9 +577,9 @@ autocmd FileType ruby,eruby,haml set keywordprg=:Dash!
 
 
 " vimtex configuration
-let g:vimtex_view_general_viewer
-			\ = '/Applications/Skim.app/Contents/SharedSupport/displayline'
-let g:vimtex_view_general_options = '-r @line @pdf @tex'
+let g:vimtex_view_method = 'skim'
+" Don't open/close the quickfix list automatically
+let g:vimtex_quickfix_mode = 0
 augroup latexSurround
 	autocmd!
 	autocmd FileType tex call s:latexSurround()
