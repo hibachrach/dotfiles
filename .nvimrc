@@ -78,6 +78,7 @@ Plug 'tpope/vim-rails'              " Additional rails help
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
 Plug 'junegunn/vader.vim', { 'for': 'vader' }
+Plug 'rhysd/vim-crystal'
 " Language/library specific plugins that I do not actively use
 " For one reason or another, I don't code actively in these languages.
 " However, I have found these useful when coding _in_ said languages
@@ -85,7 +86,6 @@ Plug 'junegunn/vader.vim', { 'for': 'vader' }
 Plug 'slim-template/vim-slim', { 'for': 'slim' }
 Plug 'digitaltoad/vim-pug', { 'for': ['vue', 'pug']}
 Plug 'posva/vim-vue', { 'for': 'vue' }
-Plug 'rhysd/vim-crystal'
 Plug 'ElmCast/elm-vim', { 'for': 'elm' }
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'mxw/vim-jsx', { 'for': 'jsx' }  " React/JSX syntax highlighting/indenting
