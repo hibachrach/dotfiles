@@ -73,6 +73,7 @@ Plug 'edkolev/promptline.vim' " Customize shell prompt
 " Plug 'sheerun/vim-polyglot'
 Plug '~/personal/programming/forks/ale'                     " Asynchronous linter
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
+Plug 'tpope/vim-bundler'            " Additional help with bundler and external gems
 Plug 'tpope/vim-rails'              " Additional rails help
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
