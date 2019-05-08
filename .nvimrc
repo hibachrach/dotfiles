@@ -559,6 +559,9 @@ let g:ale_fixers = {
 \   'xml': [
 \       'tidy'
 \   ],
+\   'json': [
+\       'prettier'
+\   ],
 \   'svg': [
 \       'tidy'
 \   ],
