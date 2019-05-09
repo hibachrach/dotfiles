@@ -4,12 +4,12 @@
 - clean: ['~']
 
 - link:
-  ~/.dotfiles: ''
-  ~/.tmux.conf: tmux.conf
-  ~/.nvim: config/nvim
-  ~/.vim: vim
-  ~/.zshrc:
-    force: true
-    path: zshrc
+    ~/.dotfiles: ''
+    ~/.tmux.conf: .tmux.conf
+    ~/.config/nvim/init.vim: .nvimrc
+    ~/.vim/vimrc: .vimrc
+    ~/.zshrc:
+      force: true
+      path: .zshrc
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
