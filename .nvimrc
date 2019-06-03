@@ -29,6 +29,7 @@ Plug '~/personal/programming/seoul256.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'   " Fuzzy file search (hooked up to C-P for me)
 Plug 'mileszs/ack.vim'    " Support Ag under Ack command with quickfix list integration
+Plug 'dylanaraps/fff.vim' " Support fff from within vim
 
 " Editor Keybindings/Motions
 Plug 'tpope/vim-unimpaired'       " Pairs of useful keymappings
@@ -405,19 +406,12 @@ nnoremap <Leader>e :AgIgnoreFilename<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <C-N> :Lines<CR>
 nnoremap <C-P> :Files<CR>
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>0)
-nnoremap <Leader>r :Rg<CR>
 
 
-" ag.vim configuration
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
-endif
+
+" fff.vim configuration
+nnoremap <Leader>r :F<CR>
+
 
 " targets.vim configuration
 let g:targets_argOpening = '[({[]'
