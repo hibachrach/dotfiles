@@ -428,7 +428,7 @@ let g:easy_align_delimiters = { ';': { 'pattern': ':', 'left_margin': 1, 'right_
 " vim-fugitive configuration
 nnoremap <Leader>gw :Gwrite<CR>
 nnoremap <Leader>gs :Gstatus<CR>
-nnoremap <Leader>gc :Gcommit<CR>
+nnoremap <Leader>gc :Gcommit -v<CR>
 nnoremap <Leader>gp :Gpush<CR>
 nnoremap <Leader>gfp :Gpush -f<CR>
 
