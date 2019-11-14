@@ -47,14 +47,16 @@ Plug 'kana/vim-textobj-user'
 
 " Interfaces
 Plug 'tpope/vim-eunuch'               " Adds nice Unix shortcuts to Vim
-Plug 'tpope/vim-fugitive'             " Git wrapper for vim
+Plug 'tpope/vim-fugitive', { 'commit': '2b5fdf1'}             " Git wrapper for vim
 Plug 'tpope/vim-rhubarb'              " GitHub wrapper for vim
+Plug 'junegunn/gv.vim'                " tig-like git log browser
 Plug 'janko-m/vim-test'               " Running tests in vim
 Plug 'benmills/vimux'                 " Send commands to tmux panes from vim; used in vim-test
-Plug 'airblade/vim-gitgutter'         " Show changes in the left gutter; stage individual hunks
+Plug 'airblade/vim-gitgutter', { 'commit': '50932df' }         " Show changes in the left gutter; stage individual hunks
 Plug 'christoomey/vim-tmux-navigator' " Enables vim-tmux nav with C-h/j/k/l keys
 Plug 'jpalardy/vim-slime'             " Send commands over to another tmux pane!
 Plug 'rizzatti/dash.vim'              " Query Dash.app from vim
+Plug 'alx741/vinfo'                   " Browse man/info pages from vim
 
  
 " Autocompletion
@@ -78,8 +80,10 @@ Plug 'tpope/vim-bundler'            " Additional help with bundler and external 
 Plug 'tpope/vim-rails'              " Additional rails help
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
+Plug 'groenewege/vim-less', { 'for': 'less' }
 Plug 'junegunn/vader.vim', { 'for': 'vader' }
-Plug 'rhysd/vim-crystal'
+Plug 'rhysd/vim-crystal', { 'for': 'crystal' }
+Plug 'dag/vim-fish', { 'for': 'fish' }
 " Language/library specific plugins that I do not actively use
 " For one reason or another, I don't code actively in these languages.
 " However, I have found these useful when coding _in_ said languages
@@ -90,9 +94,11 @@ Plug 'posva/vim-vue', { 'for': 'vue' }
 Plug 'ElmCast/elm-vim', { 'for': 'elm' }
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'mxw/vim-jsx', { 'for': 'jsx' }  " React/JSX syntax highlighting/indenting
+Plug 'reasonml-editor/vim-reason-plus', { 'for': 'reason' }
+Plug 'calviken/vim-gdscript3'
 " Plug 'HerringtonDarkholme/yats.vim' " yet-another-typescript-syntax
 " Plug 'fs111/pydoc.vim' 
-" Plug 'zah/nim.vim'                  " Nim language support for [n]vim
+Plug 'zah/nim.vim', { 'for': 'nim'  }                  " Nim language support for [n]vim
 Plug 'lervag/vimtex', { 'for': 'tex' }                " Vim plugin for working with .tex files
 if has('nvim')
 "   Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
@@ -138,7 +144,7 @@ set noswapfile              " Swap files aren't really necessary with git and un
 set showtabline=2           " Always show tab list; utilized by bufferline to show buffers
 set cmdwinheight=1
 set mouse+=a
-set shell=zsh\ --login
+set shell=zsh
 if &term =~ '^xterm' && !has('nvim')
     " tmux knows the extended mouse mode
     set ttymouse=xterm2
@@ -190,6 +196,11 @@ nnoremap <leader>w :bp <BAR> bd #<CR>
 nnoremap <leader>ve :vsplit $MYVIMRC<CR>
 nnoremap <leader>vs :source $MYVIMRC<CR>
 nnoremap <leader>ze :vsplit ~/.zshrc<CR>
+nnoremap <leader>fe :vsplit ~/.config/fish/config.fish<CR>
+" Copy filename to system clipboard
+if executable('pbcopy')
+  nnoremap <leader>c :silent !printf "%" <BAR> pbcopy<CR>
+endif
 " Navigate based on visual line breaks
 nnoremap j gj
 nnoremap k gk
@@ -401,8 +412,10 @@ let g:Hexokinase_virtualText = '███'
 " ensure fzf respects .gitignore
 let $FZF_DEFAULT_COMMAND ='ag -g ""'
 command! -bang -nargs=* AgIgnoreFilename call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
+command! -bang -nargs=* AgWithoutVCSIgnores call fzf#vim#ag(<q-args>, '--skip-vcs-ignores', {'options': '--delimiter : --nth 4..'}, <bang>0)
 nnoremap <Leader>a :Ag<CR>
 nnoremap <Leader>e :AgIgnoreFilename<CR>
+nnoremap <Leader>q :AgWithoutVCSIgnores<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <C-N> :Lines<CR>
 nnoremap <C-P> :Files<CR>
@@ -494,8 +507,8 @@ if has('nvim')
   " let g:deoplete#complete_method = 'omnifunc'
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#auto_refresh_delay = 200
-  let g:deoplete#sources#crystal#lib = '/Users/harry/source-dirs/crystal/src'
-  let g:deoplete#sources#crystal#bin = '/Users/harry/path_dependencies/cracker'
+  " let g:deoplete#sources#crystal#lib = '/Users/harry/source-dirs/crystal/src'
+  " let g:deoplete#sources#crystal#bin = '/Users/harry/path_dependencies/cracker'
   let g:deoplete#enable_profile = 1
 endif
 
@@ -536,7 +549,8 @@ nmap <silent> <leader>i <Plug>(ale_detail)
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%] [%code%]'
-" let g:ale_ruby_rubocop_executable = 'bundle'
+let g:ale_ruby_rubocop_executable = 'bundle'
+let g:ale_javascript_eslint_options = '--ext .jsx'
 let g:ale_fixers = {
 \   'ruby': [
 \       'rubocop'
@@ -555,6 +569,9 @@ let g:ale_fixers = {
 \   ],
 \   'json': [
 \       'prettier'
+\   ],
+\   'sql': [
+\       'pgformatter'
 \   ],
 \   'svg': [
 \       'tidy'
