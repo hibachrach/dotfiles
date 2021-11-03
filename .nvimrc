@@ -40,11 +40,13 @@ Plug 'AndrewRadev/switch.vim'     " Easily switch between states/formats for var
 
 " Advanced text manipulation
 Plug 'tpope/vim-abolish' " Case-smart replacement; case coercion
+Plug 'chrisbra/unicode.vim'
 
 " Interfaces
 Plug 'tpope/vim-eunuch'               " Adds nice Unix shortcuts to Vim
 Plug 'tpope/vim-fugitive'             " Git wrapper for vim
 Plug 'tpope/vim-rhubarb'              " Enable vim-fugitive to browse stuff on GitHub
+Plug 'junegunn/gv.vim'                " Enable easy git log browsing
 Plug 'janko-m/vim-test'               " Running tests in vim
 Plug 'benmills/vimux'                 " Send commands to tmux panes from vim; used in vim-test
 Plug 'airblade/vim-gitgutter'         " Show changes in the left gutter; stage individual hunks
@@ -61,15 +63,31 @@ Plug 'edkolev/promptline.vim' " Customize shell prompt
 
 " Language/library specific plugins
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
+Plug 'leafgarland/typescript-vim'
 Plug 'tpope/vim-bundler'            " Additional help with bundler and external gems
 Plug 'tpope/vim-rails'              " Additional rails help
+Plug 'rlue/vim-fold-rspec'
 Plug 'groenewege/vim-less', { 'for': 'less' }
 Plug 'yuezk/vim-js', { 'for': ['javascript', 'javascriptreact']}
 Plug 'maxmellon/vim-jsx-pretty', { 'for': ['javascript', 'javascriptreact']}
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'cespare/vim-toml', { 'for': 'toml' }
 Plug 'reasonml-editor/vim-reason-plus'
+Plug 'amiralies/vim-rescript'
 Plug 'elixir-editors/vim-elixir'
+Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
+Plug 'itchyny/vim-haskell-indent', { 'for': 'haskell' }
+Plug 'alx741/vim-hindent', { 'for': 'haskell' }
+Plug 'tpope/vim-markdown', { 'for': 'markdown' }
+Plug 'neoclide/jsonc.vim'
+Plug 'zah/nim.vim'
+Plug 'ChrisWellsWood/roc.vim'
+Plug 'fsharp/vim-fsharp', {
+      \ 'for': 'fsharp',
+      \ 'do':  'make fsautocomplete',
+      \}
+Plug '~/.opam/default/share/merlin/vim'
+Plug 'gleam-lang/gleam.vim'
 " Plug '~/personal/programming/forks/rubyfmt-vim'
 
 " Language/library specific plugins that I do not actively use
@@ -121,6 +139,9 @@ endif
 if has('termguicolors')
   set termguicolors " 24 bit terminal
 endif
+
+let ruby_fold = 1
+let ruby_foldable_groups = 'class module def do if'
 
 
 let g:seoul256_background = 235
@@ -192,6 +213,9 @@ set statusline+=\   " space char literal
 set statusline+=%P  " percent of way through file
 
 set tabline=%1T
+
+" Good for lightweight error format detection from arbitrary sources
+set errorformat+=%f:%l
 
 
 if executable('ripgrep')
@@ -269,6 +293,7 @@ nnoremap <silent> s :set operatorfunc=AgFromMotionIgnoreFilename<cr>g@
 vnoremap <silent> s :<C-U>call AgFromMotionIgnoreFilename(visualmode(), 1)<cr>
 nnoremap <silent> S :set operatorfunc=AgFromMotion<cr>g@
 vnoremap <silent> S :<C-U>call AgFromMotion(visualmode(), 1)<cr>
+nnoremap <silent> ' :set operatorfunc=AgFromMotionIgnoreTests<cr>g@
 
 function! AgFromMotionIgnoreFilename(type, ...)
   let sel_save = &selection
@@ -308,6 +333,42 @@ function! AgFromMotion(type, ...)
   let @@ = reg_save
 endfunction
 
+function! AgFromMotionIgnoreTests(type, ...)
+  let sel_save = &selection
+  let &selection = "inclusive"
+  let reg_save = @@
+
+  if a:0  " Invoked from Visual mode, use gv command.
+    silent exe "normal! gvy"
+  elseif a:type == 'line'
+    silent exe "normal! '[V']y"
+  else
+    silent exe "normal! `[v`]y"
+  endif
+
+  exe ":AgIgnoreTests " . @"
+
+  let &selection = sel_save
+  let @@ = reg_save
+endfunction
+
+" function! s:find_root()
+"   for vcs in ['.git', '.svn', '.hg']
+"     let dir = finddir(vcs.'/..', ';')
+"     if !empty(dir)
+"       execute 'FZF' dir
+"       return
+"     endif
+"   endfor
+"   FZF
+" endfunction
+
+
+" function! FZFInCurrentBufferRepo()
+"   let dir = s:find_root(vcs.'/..', expand('%:p:h').';')
+" endfunction
+
+command! -range=% Pdf execute "<line1>,<line2>w !pandoc -f markdown -t pdf | zathura --mode fullscreen -"
 
 " Use a vim-buffer-like pane for executing commands 
 nnoremap : q:i
@@ -396,6 +457,7 @@ let g:Hexokinase_v2 = 0
 " ensure fzf respects .gitignore
 let $FZF_DEFAULT_COMMAND ='ag -g ""'
 command! -bang -nargs=* AgIgnoreFilename call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
+command! -bang -nargs=* AgIgnoreTests call fzf#vim#ag(<q-args>, '--ignore test/ --ignore spec/', <bang>0)
 command! -bang -nargs=* AgWithoutVCSIgnores call fzf#vim#ag(<q-args>, '--skip-vcs-ignores', {'options': '--delimiter : --nth 4..'}, <bang>0)
 nnoremap <Leader>a :Ag<CR>
 nnoremap <Leader>e :AgIgnoreFilename<CR>
@@ -504,3 +566,41 @@ let g:promptline_preset = {
         \'warn' : [ promptline#slices#last_exit_code() ]}
 
 let g:promptline_powerline_symbols = 0
+
+
+" vim-rails configuration
+let g:rails_projections = {
+      \ "app/webpack_assets/*.js": {
+      \   "alternate": [
+      \     "spec/webpack_assets/{}.spec.js",
+      \   ],
+      \ },
+      \ "app/webpack_assets/*.coffee": {
+      \   "alternate": [
+      \     "spec/webpack_assets/{}.spec.js",
+      \   ],
+      \ },
+      \ "app/webpack_assets/*.jsx": {
+      \   "alternate": [
+      \     "spec/webpack_assets/{}.spec.jsx",
+      \   ],
+      \ },
+      \ "spec/webpack_assets/*.spec.jsx": {
+      \   "alternate": [
+      \     "app/webpack_assets/{}.jsx",
+      \   ],
+      \ },
+      \ "spec/webpack_assets/*.spec.js": {
+      \   "alternate": [
+      \     "app/webpack_assets/{}.coffee.erb",
+      \     "app/webpack_assets/{}.js.erb",
+      \     "app/webpack_assets/{}.coffee",
+      \     "app/webpack_assets/{}.js",
+      \   ],
+      \ },
+      \}
+
+
+
+" vim-markdown configuration
+let g:markdown_fenced_languages = ['html', 'ruby', 'bash=sh']
