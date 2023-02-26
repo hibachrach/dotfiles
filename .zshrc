@@ -13,7 +13,7 @@ export PATH=/usr/local/bin:$PATH
 
 ### Oh My Zsh (plugin manager) configuration
 # Path to oh-my-zsh installation.
-export ZSH=/Users/harry/.oh-my-zsh
+export ZSH=/Users/hbachrach/.oh-my-zsh
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
@@ -63,6 +63,14 @@ bindkey -M viins 'jj' vi-cmd-mode
 alias gwd="git webdiff"
 alias gcm!="git commit --amend --reuse-message HEAD"
 alias grh~="git reset HEAD~"
+alias gfu="git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
+
+
+### For Ripgrep
+
+export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
+alias rg="rg --hidden --glob '!.git'"
+alias rgnt="rg -g'!test/' -g'!spec/'"
 
 ### For (n)vim or whichever editor
 
@@ -85,6 +93,16 @@ function vs() {
   else
     echo "usage: `basename $0` <regex>"
     echo "searches current directory with \`rg\`, opens (vim-like) $EDITOR, and adds matches to the quickfix list"
+  fi
+}
+
+function vsnt() {
+  if [ $# -ne 0 ] && [ $1 != "-h" ]; then
+    # Presumes EDITOR is vi-esque (e.g. vi, vim, nvim, etc.)
+    $EDITOR -q <(rgnt --vimgrep "$@")
+  else
+    echo "usage: `basename $0` <regex>"
+    echo "searches current directory with \`rg\`, opens (vim-like) $EDITOR, and adds matches to the quickfix list (ignores test dirs)"
   fi
 }
 
@@ -128,6 +146,27 @@ function gcof() {
   git checkout $(echo "$branch" | awk '{print $1}' | sed "s/.* //")
 }
 
+function fzf-git-changed-files-widget() {
+  LBUFFER="${LBUFFER}$(__gdsel)"
+  local ret=$?
+  zle reset-prompt
+  return $ret
+}
+
+function __gdsel() {
+  local cmd="git diff --name-only; git ls-files --others --exclude-standard"
+  setopt localoptions pipefail 2> /dev/null
+  eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS" $(__fzfcmd) -m "$@" | while read item; do
+    echo -n "${(q)item} "
+  done
+  local ret=$?
+  echo
+  return $ret
+}
+
+zle -N fzf-git-changed-files-widget
+bindkey '^A' fzf-git-changed-files-widget
+
 # Fuzzy-search the contents of the files in the current directory and open the
 # selected files
 # function fl() {
@@ -152,10 +191,6 @@ function gcof() {
 #                     cat {}) 2> /dev/null | head -500'
 # }
 
-### For Ripgrep
-
-export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
-
 ### For tmux
 
 alias t="tmux attach -t"
@@ -166,10 +201,10 @@ alias tn="tmux new -s"
 alias f="fff"
 
 alias google-chrome="open -a '/Applications/Google Chrome.app' "
-alias go_to_gems="cd /Users/harry/.rbenv/versions/2.5.7/lib/ruby/gems/2.5.0/gems"
+alias go_to_gems="cd /Users/hbachrach/.rbenv/versions/2.7.3/lib/ruby/gems/2.7.0/gems"
 
-export PATH="/Users/harry/path_dependencies:$PATH"
-export PATH="/Users/harry/scripts:$PATH"
+export PATH="/Users/hbachrach/path_dependencies:$PATH"
+export PATH="/Users/hbachrach/scripts:$PATH"
 
 ## Language-specific tools
 
@@ -216,7 +251,7 @@ export PAGER="less -S" # Prevents wrapping with long rows
 eval "$(nodenv init -)"
 
 ### For Java
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+export JAVA_HOME=$(/usr/libexec/java_home -v14)
 
 ### For Crystal
 export PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
@@ -235,17 +270,21 @@ export PATH="$HOME/.nimble/bin/:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # added by travis gem
-[ -f /Users/harry/.travis/travis.sh ] && source /Users/harry/.travis/travis.sh
+[ -f /Users/hbachrach/.travis/travis.sh ] && source /Users/hbachrach/.travis/travis.sh
 
 export CPATH=`xcrun --show-sdk-path`/usr/include
 
 
 export RUBYFMT_USE_RELEASE=1
-alias rubyfmt="/Users/harry/.rbenv/versions/2.5.8/bin/ruby --disable=all /Users/harry/personal/programming/forks/rubyfmt/rubyfmt.rb" 
+alias rubyfmt="/Users/hbachrach/.rbenv/versions/2.5.8/bin/ruby --disable=all /Users/hbachrach/personal/programming/forks/rubyfmt/rubyfmt.rb" 
 
 
 ### For direnv
-eval "$(direnv hook zsh)"
+# eval "$(direnv hook zsh)"
 
 ### For Elixir
 test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
+
+[ -f "/Users/hbachrach/.ghcup/env" ] && source "/Users/hbachrach/.ghcup/env" # ghcup-env
+
+# export PATH="/usr/local/opt/llvm/bin:$PATH"

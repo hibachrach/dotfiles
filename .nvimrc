@@ -64,6 +64,7 @@ Plug 'edkolev/promptline.vim' " Customize shell prompt
 " Language/library specific plugins
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'leafgarland/typescript-vim'
+Plug 'jparise/vim-graphql'
 Plug 'tpope/vim-bundler'            " Additional help with bundler and external gems
 Plug 'tpope/vim-rails'              " Additional rails help
 Plug 'rlue/vim-fold-rspec'
@@ -289,13 +290,13 @@ nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
 nnoremap <Leader>u :cp<CR>
 nnoremap <Leader>o :cn<CR>
-nnoremap <silent> s :set operatorfunc=AgFromMotionIgnoreFilename<cr>g@
-vnoremap <silent> s :<C-U>call AgFromMotionIgnoreFilename(visualmode(), 1)<cr>
-nnoremap <silent> S :set operatorfunc=AgFromMotion<cr>g@
-vnoremap <silent> S :<C-U>call AgFromMotion(visualmode(), 1)<cr>
-nnoremap <silent> ' :set operatorfunc=AgFromMotionIgnoreTests<cr>g@
+nnoremap <silent> s :set operatorfunc=RgFromMotionIgnoreFilename<cr>g@
+vnoremap <silent> s :<C-U>call RgFromMotionIgnoreFilename(visualmode(), 1)<cr>
+nnoremap <silent> S :set operatorfunc=RgFromMotion<cr>g@
+vnoremap <silent> S :<C-U>call RgFromMotion(visualmode(), 1)<cr>
+nnoremap <silent> ' :set operatorfunc=RgFromMotionIgnoreTests<cr>g@
 
-function! AgFromMotionIgnoreFilename(type, ...)
+function! RgFromMotionIgnoreFilename(type, ...)
   let sel_save = &selection
   let &selection = "inclusive"
   let reg_save = @@
@@ -308,13 +309,13 @@ function! AgFromMotionIgnoreFilename(type, ...)
     silent exe "normal! `[v`]y"
   endif
 
-  exe ":AgIgnoreFilename " . @"
+  exe ":RgIgnoreFilename " . @"
 
   let &selection = sel_save
   let @@ = reg_save
 endfunction
 
-function! AgFromMotion(type, ...)
+function! RgFromMotion(type, ...)
   let sel_save = &selection
   let &selection = "inclusive"
   let reg_save = @@
@@ -333,7 +334,7 @@ function! AgFromMotion(type, ...)
   let @@ = reg_save
 endfunction
 
-function! AgFromMotionIgnoreTests(type, ...)
+function! RgFromMotionIgnoreTests(type, ...)
   let sel_save = &selection
   let &selection = "inclusive"
   let reg_save = @@
@@ -346,7 +347,7 @@ function! AgFromMotionIgnoreTests(type, ...)
     silent exe "normal! `[v`]y"
   endif
 
-  exe ":AgIgnoreTests " . @"
+  exe ":RgIgnoreTests " . @"
 
   let &selection = sel_save
   let @@ = reg_save
@@ -374,9 +375,21 @@ command! -range=% Pdf execute "<line1>,<line2>w !pandoc -f markdown -t pdf | zat
 nnoremap : q:i
 
 if has('nvim')
+  function! CheckBackspace() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+  endfunction
+
 	" Use `<TAB>` to scroll through pop-up menu
-	inoremap <expr><TAB> pumvisible() ? "\<C-N>" : "\<TAB>"
-	inoremap <expr><S-TAB> pumvisible() ? "\<C-P>" : "\<S-TAB>"
+  inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+  inoremap <silent><expr> <C-x><C-z> coc#pum#visible() ? coc#pum#stop() : "\<C-x>\<C-z>"
+  " remap for complete to use tab and <cr>
+  inoremap <silent><expr> <TAB>
+        \ coc#pum#visible() ? coc#pum#next(1) :
+        \ CheckBackspace() ? "\<Tab>" :
+        \ coc#refresh()
+  inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+  inoremap <silent><expr> <c-space> coc#refresh()
 endif
 " }}}
 
@@ -427,6 +440,12 @@ augroup END
 " PLUGIN CONFIGURATIONS
 " ---------------------
 " {{{
+
+
+" built-in plugins configuration
+let g:html_indent_inctags = "p"
+
+
 " vim-highlightedyank configuration
 if !has('nvim')
   map y <Plug>(highlightedyank)
@@ -455,13 +474,13 @@ let g:Hexokinase_v2 = 0
 
 " fzf.vim configuration
 " ensure fzf respects .gitignore
-let $FZF_DEFAULT_COMMAND ='ag -g ""'
-command! -bang -nargs=* AgIgnoreFilename call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
-command! -bang -nargs=* AgIgnoreTests call fzf#vim#ag(<q-args>, '--ignore test/ --ignore spec/', <bang>0)
-command! -bang -nargs=* AgWithoutVCSIgnores call fzf#vim#ag(<q-args>, '--skip-vcs-ignores', {'options': '--delimiter : --nth 4..'}, <bang>0)
-nnoremap <Leader>a :Ag<CR>
-nnoremap <Leader>e :AgIgnoreFilename<CR>
-nnoremap <Leader>q :AgWithoutVCSIgnores<CR>
+let $FZF_DEFAULT_COMMAND ='fd --type file --hidden --exclude .git --'
+command! -bang -nargs=* RgIgnoreFilename call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1, fzf#vim#with_preview(), <bang>0)
+command! -bang -nargs=* RgIgnoreTests call fzf#vim#grep(<q-args>, '--glob !test/ --glob !spec/', <bang>0)
+command! -bang -nargs=* RgWithoutVCSIgnores call fzf#vim#grep(<q-args>, '--no-ignore-vcs', {'options': '--delimiter : --nth 4..'}, <bang>0)
+nnoremap <Leader>a :Rg<CR>
+nnoremap <Leader>e :RgIgnoreFilename<CR>
+nnoremap <Leader>q :RgWithoutVCSIgnores<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <C-N> :Lines<CR>
 nnoremap <C-P> :Files<CR>
@@ -482,12 +501,12 @@ let g:easy_align_delimiters = { ';': { 'pattern': ':', 'left_margin': 1, 'right_
 
 " vim-fugitive configuration
 nnoremap <Leader>gw :Gwrite<CR>
-nnoremap <Leader>gs :Gstatus<CR>
-nnoremap <Leader>gc :Gcommit -v<CR>
-nnoremap <Leader>gp :Gpush<CR>
-nnoremap <Leader>gfp :Gpush -f<CR>
-nnoremap <Leader>gy :.Gbrowse!<CR>
-vnoremap <Leader>gy :'<'>Gbrowse!<CR>
+nnoremap <Leader>gs :G status<CR>
+nnoremap <Leader>gc :G commit -v<CR>
+nnoremap <Leader>gp :G push<CR>
+nnoremap <Leader>gfp :G push -f<CR>
+nnoremap <Leader>gy :.GBrowse!<CR>
+vnoremap <Leader>gy :'<'>GBrowse!<CR>
 
 
 
@@ -527,14 +546,35 @@ endif
 nmap <silent> <leader>n <Plug>(coc-diagnostic-prev)
 nmap <silent> <leader>p <Plug>(coc-diagnostic-next)
 nmap <silent> <leader>f <Plug>(coc-format)
+nmap <silent> <leader>i <Plug>(coc-fix-current)
+nmap <silent> <leader>I :CocFix<CR>
+xmap <leader>d <Plug>(coc-codeaction-selected)
+nmap <leader>d <Plug>(coc-codeaction-selected)
 
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
 " Use K to show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -570,32 +610,32 @@ let g:promptline_powerline_symbols = 0
 
 " vim-rails configuration
 let g:rails_projections = {
-      \ "app/webpack_assets/*.js": {
+      \ "*.js": {
       \   "alternate": [
-      \     "spec/webpack_assets/{}.spec.js",
+      \     "{}.spec.js",
       \   ],
       \ },
-      \ "app/webpack_assets/*.coffee": {
+      \ "*.coffee": {
       \   "alternate": [
-      \     "spec/webpack_assets/{}.spec.js",
+      \     "{}.spec.js",
       \   ],
       \ },
-      \ "app/webpack_assets/*.jsx": {
+      \ "*.jsx": {
       \   "alternate": [
-      \     "spec/webpack_assets/{}.spec.jsx",
+      \     "{}.spec.jsx",
       \   ],
       \ },
-      \ "spec/webpack_assets/*.spec.jsx": {
+      \ "*.spec.jsx": {
       \   "alternate": [
-      \     "app/webpack_assets/{}.jsx",
+      \     "{}.jsx",
       \   ],
       \ },
-      \ "spec/webpack_assets/*.spec.js": {
+      \ "*.spec.js": {
       \   "alternate": [
-      \     "app/webpack_assets/{}.coffee.erb",
-      \     "app/webpack_assets/{}.js.erb",
-      \     "app/webpack_assets/{}.coffee",
-      \     "app/webpack_assets/{}.js",
+      \     "{}.coffee.erb",
+      \     "{}.js.erb",
+      \     "{}.coffee",
+      \     "{}.js",
       \   ],
       \ },
       \}

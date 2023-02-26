@@ -4,12 +4,24 @@
 - clean: ['~']
 
 - link:
-    ~/.dotfiles: ''
-    ~/.tmux.conf: .tmux.conf
+    ~/Brewfile: Brewfile
+    ~/Brewfile.lock.json: Brewfile.lock.json
     ~/.config/nvim/init.vim: .nvimrc
+    ~/.config/kitty/kitty.conf: .config/kitty/kitty.conf
+    ~/.dotfiles: ''
+    ~/.promptline_git_status.sh: .promptline_git_status.sh
+    ~/.promptline_snapshot.sh: .promptline_snapshot.sh
+    ~/.psqlrc: .psqlrc
+    ~/.tmux.conf: .tmux.conf
+    ~/.tmuxline_snapshot: .tmuxline_snapshot
     ~/.vim/vimrc: .vimrc
+    ~/.zshenv: .zshenv
     ~/.zshrc:
       force: true
       path: .zshrc
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
+  - 
+    command: brew bundle
+    stdout: true
+    stderr: true
