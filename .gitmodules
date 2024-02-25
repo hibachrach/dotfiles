@@ -4,3 +4,9 @@
 [submodule "dotbot-npm"]
 	path = dotbot-npm
 	url = git@github.com:ameliagapin/dotbot-npm.git
+[submodule "dotbot-rust"]
+	path = dotbot-rust
+	url = https://github.com/alexcormier/dotbot-rust
+[submodule "nushell/nu_scripts"]
+	path = nushell/nu_scripts
+	url = https://github.com/nushell/nu_scripts

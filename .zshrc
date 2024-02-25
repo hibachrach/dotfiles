@@ -15,10 +15,6 @@ export PATH=/usr/local/bin:$PATH
 # Path to oh-my-zsh installation.
 export ZSH=/Users/hbachrach/.oh-my-zsh
 
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
 # Plugins to be loaded by oh-my-zsh
 plugins=(you-should-use git vi-mode bundler)
 
@@ -84,12 +80,17 @@ alias vd="$EDITOR \$(git diff HEAD --name-only --diff-filter=ACMR) \$(git ls-fil
 # Open files with staged changes
 alias vds="$EDITOR \$(git diff --staged --name-only --diff-filter=ACMR)"
 # Open files that were changed in the last commit
-alias vdc="$EDITOR \$(git diff HEAD^ --name-only --diff-filter=ACMR)"
+function vdc() {
+  local ref=$1
+  $EDITOR $(git diff "${ref:-HEAD^}" --name-only --diff-filter=ACMR)
+}
+
+alias vimdiff="nvim -d"
 
 function vs() {
   if [ $# -ne 0 ] && [ $1 != "-h" ]; then
     # Presumes EDITOR is vi-esque (e.g. vi, vim, nvim, etc.)
-    $EDITOR -q <(rg --vimgrep "$@")
+    $EDITOR -q =(rg --vimgrep "$@")
   else
     echo "usage: `basename $0` <regex>"
     echo "searches current directory with \`rg\`, opens (vim-like) $EDITOR, and adds matches to the quickfix list"
@@ -104,6 +105,10 @@ function vsnt() {
     echo "usage: `basename $0` <regex>"
     echo "searches current directory with \`rg\`, opens (vim-like) $EDITOR, and adds matches to the quickfix list (ignores test dirs)"
   fi
+}
+
+function ppsql() {
+  sqlfmt - | bat -l sql
 }
 
 alias tmr=tmuxinator
@@ -201,7 +206,7 @@ alias tn="tmux new -s"
 alias f="fff"
 
 alias google-chrome="open -a '/Applications/Google Chrome.app' "
-alias go_to_gems="cd /Users/hbachrach/.rbenv/versions/2.7.3/lib/ruby/gems/2.7.0/gems"
+alias go_to_gems="cd /Users/hbachrach/.rbenv/versions/3.0.6/lib/ruby/gems/3.0.0/gems"
 
 export PATH="/Users/hbachrach/path_dependencies:$PATH"
 export PATH="/Users/hbachrach/scripts:$PATH"
@@ -212,20 +217,7 @@ export PATH="/Users/hbachrach/scripts:$PATH"
 
 alias p="python3"
 alias pip="pip3"
-
-#### For virtualenvwrapper
-# export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
-# export WORKON_HOME=~/.virtualenvs
-# source /usr/local/bin/virtualenvwrapper.sh
-
-# Have tmux respect active venv when splitting panes
-# if [ -n "$VIRTUAL_ENV" ]; then
-#     source $VIRTUAL_ENV/bin/activate;
-# fi
-
-# if [[ -n "$TMUX" ]]; then
-#     tmux set-environment VIRTUAL_ENV $VIRTUAL_ENV
-# fi
+export PATH="/Users/hbachrach/.local/bin/:$PATH"
 
 ### For ruby
 
@@ -288,3 +280,5 @@ test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
 [ -f "/Users/hbachrach/.ghcup/env" ] && source "/Users/hbachrach/.ghcup/env" # ghcup-env
 
 # export PATH="/usr/local/opt/llvm/bin:$PATH"
+
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

@@ -3,9 +3,12 @@
       relink: true
 - clean: ['~']
 
+- shell:
+  - [git submodule update --init --recursive, Installing submodules]
 - link:
     ~/Brewfile: Brewfile
     ~/Brewfile.lock.json: Brewfile.lock.json
+    "~/Library/Application Support/nushell/": nushell
     ~/.config/nvim/init.vim: .nvimrc
     ~/.config/kitty/kitty.conf: .config/kitty/kitty.conf
     ~/.dotfiles: ''
@@ -20,8 +23,14 @@
       force: true
       path: .zshrc
 - shell:
-  - [git submodule update --init --recursive, Installing submodules]
   - 
     command: brew bundle
     stdout: true
     stderr: true
+  - [rustup install]
+  - [cargo install tealdeer]
+  - [cargo install cargo-watch]
+  - [cargo install cargo-expand]
+  - [cargo install feel]
+- npm:
+  - 'bash-language-server'
