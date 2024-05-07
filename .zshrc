@@ -74,6 +74,7 @@ export EDITOR="nvim"
 # NOTE: ACMR means (Added || Copied || Modified || Renamed), see
 # `--diff-filter` in `man git-diff` for details
 alias v="$EDITOR"
+alias h="hx"
 # Open files that have been added or changed since the last commit (including
 # untracked files)
 alias vd="$EDITOR \$(git diff HEAD --name-only --diff-filter=ACMR) \$(git ls-files --others --exclude-standard)"
@@ -282,3 +283,5 @@ test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
 # export PATH="/usr/local/opt/llvm/bin:$PATH"
 
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+export OVERCOMMIT_DISABLE=1 # For now...

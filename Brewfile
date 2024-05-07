@@ -12,7 +12,7 @@ brew 'fd' # Best `find` alternative
 brew 'fzf' # Fuzzy finder for anything
 brew 'reattach-to-user-namespace' # Reattach process (e.g., tmux) to background
 brew 'diff-so-fancy' # Better git diffs
-brew 'tig' # text-mode interface for
+brew 'tig' # text-mode interface for git
 brew 'tree' # visualize directories
 brew 'grip' # render GitHub flavored markdown
 brew 'bat' # a fancier `cat`
@@ -20,6 +20,8 @@ brew 'hyperfine' # a better timer
 brew 'trash'
 brew 'sqlfmt' # Format SQL
 brew 'gh'
+brew 'git-absorb' # Automatically identify and merge `--fixup` changes
+brew 'mkcert' # Easily create local TLS certificates 
 
 cask 'alfred'
 cask '1password'

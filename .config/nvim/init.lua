@@ -18,21 +18,20 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup(
   {
     -- Enforcing sane behavior
-    'tpope/vim-sensible',              -- Reasonable vim defaults
     'tpope/vim-repeat',                -- Make `.` work like it should
     'tpope/vim-endwise',               -- Automatically add `end` when in Ruby
-    'Townk/vim-autoclose',             -- Automatic closure of parens, braces, and brackets
+    -- 'Townk/vim-autoclose',             -- Automatic closure of parens, braces, and brackets
     { dir = '~/personal/traces.vim' }, -- Highlight patterns and ranges for Ex-commands
 
     -- UI - Plugins that don't *do* anything but display information
-    'junegunn/vim-peekaboo',   -- To see vim register contents during reg access
+    'junegunn/vim-peekaboo', -- To see vim register contents during reg access
     {
       'RRethy/vim-hexokinase',
       build = 'make hexokinase',
     }, -- Show colors for hexcodes in sign column
 
     -- Colorschemes
-    -- 'nvim-treesitter/nvim-treesitter',
+    'nvim-treesitter/nvim-treesitter',
     'navarasu/onedark.nvim',
 
     -- File Navigation
@@ -80,6 +79,7 @@ require("lazy").setup(
     'hrsh7th/cmp-path',
     'hrsh7th/cmp-cmdline',
     'saadparwaiz1/cmp_luasnip',
+    'jose-elias-alvarez/null-ls.nvim',
     {
       "L3MON4D3/LuaSnip",
       version = "v2.*",
@@ -94,13 +94,7 @@ require("lazy").setup(
     'edkolev/promptline.vim', -- Customize shell prompt
 
     -- Language/library specific plugins
-    {
-      'kchmck/vim-coffee-script',
-      ft = 'coffee'
-    },
-    'leafgarland/typescript-vim',
     'jparise/vim-graphql',
-    'jonsmithers/vim-html-template-literals',
     'tpope/vim-bundler', -- Additional help with bundler and external gems
     'tpope/vim-rails',   -- Additional rails help
     'rlue/vim-fold-rspec',
@@ -109,53 +103,14 @@ require("lazy").setup(
       ft = 'less'
     },
     {
-      'yuezk/vim-js',
-      ft = { 'javascript', 'javascriptreact' },
-    },
-    {
-      'maxmellon/vim-jsx-pretty',
-      ft = { 'javascript', 'javascriptreact' },
-    },
-    {
       'rust-lang/rust.vim',
       ft = 'rust',
     },
-    {
-      'cespare/vim-toml',
-      ft = 'toml',
-    },
-    'reasonml-editor/vim-reason-plus',
-    'amiralies/vim-rescript',
     'elixir-editors/vim-elixir',
-    {
-      'neovimhaskell/haskell-vim',
-      ft = 'haskell',
-    },
-    {
-      'itchyny/vim-haskell-indent',
-      ft = 'haskell',
-    },
-    {
-      'alx741/vim-hindent',
-      ft = 'haskell',
-    },
-    -- {
-    --   'tpope/vim-markdown',
-    --   ft = 'markdown',
-    -- },
     'neoclide/jsonc.vim',
-    'zah/nim.vim',
     'ChrisWellsWood/roc.vim',
-    {
-      'fsharp/vim-fsharp',
-      ft = 'fsharp',
-      build = 'make fsautocomplete',
-    },
-    {
-      dir = '~/.opam/default/share/merlin/vim',
-      name = 'merlin',
-    },
-    'gleam-lang/gleam.vim',
+    'LhKipp/nvim-nu',
+    'nvim-lua/plenary.nvim',
     'hashivim/vim-terraform'
   },
   {
@@ -181,8 +136,9 @@ require("lazy").setup(
 -- }}}
 -- Basic configuration {{{
 vim.opt.number = true                             -- Show line numbers
-vim.opt.spelllang = 'en'                          -- Spellcheck (in comments & strings)
-vim.opt.hidden = true
+vim.opt.spell = true
+vim.opt.spelllang = 'en_us'                       -- Spellcheck (in comments & strings)
+vim.opt.hidden = true                             -- Allow for changing buffers even if current has unsaved changes
 vim.opt.expandtab = true                          -- Expand each press of <TAB> to appropriate number of spaces
 vim.opt.tabstop = 2                               -- Number of spaces each tab corresponds to
 vim.opt.shiftwidth = 2                            -- Number of spaces to indent to when using autoformatting
@@ -259,12 +215,12 @@ BuildStatusline = function()
     ']',
     status_diagnostic(),
     ' ',
-    '%<', -- truncate here if too long
+    '%<',          -- truncate here if too long
     relative_path, -- filename
     ' ',
-    '%h', -- help text indicator
-    '%m', -- modifiable flag
-    '%r', -- read only flag
+    '%h',          -- help text indicator
+    '%m',          -- modifiable flag
+    '%r',          -- read only flag
     '[',
     codeowner,
     ']',
@@ -400,6 +356,7 @@ function _G.RgFromMotionIgnoreFilename(...)
   vim.cmd('RgIgnoreFilename ' .. quote_reg)
   vim.opt.selection = old_selection
 end
+
 vim.keymap.set('n', 's', function()
   vim.opt.operatorfunc = 'v:lua.RgFromMotionIgnoreFilename'
   vim.api.nvim_feedkeys('g@', 'n', false)
@@ -407,16 +364,17 @@ end, { silent = true })
 -- }}}
 -- Language Specific configuration {{{
 local filetype_ruby_augroup = vim.api.nvim_create_augroup('filetype_ruby', { clear = true })
-vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
-  pattern = {"*.rb"},
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+  pattern = { "*.rb" },
   command = 'iabbrev dbp Rails.logger.info("##### DEBUG #{}")<Left><Left><Left>',
   group = filetype_ruby_augroup
 })
-vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
-  pattern = {"*.rb"},
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+  pattern = { "*.rb" },
   command = 'iabbrev dbd require \'pry-byebug\'; binding.pry',
   group = filetype_ruby_augroup
 })
+require('nu').setup({})
 -- }}}
 -- Language server configuration {{{
 local lspconfig = require('lspconfig')
@@ -430,8 +388,10 @@ lspconfig.html.setup({})
 lspconfig.jsonls.setup({})
 lspconfig.lua_ls.setup({})
 lspconfig.nushell.setup({})
+lspconfig.pyright.setup({})
 lspconfig.rust_analyzer.setup({})
-lspconfig.solargraph.setup({ cmd = {'bundle', 'exec', 'solargraph', 'stdio' }})
+lspconfig.solargraph.setup({ cmd = { 'bundle', 'exec', 'solargraph', 'stdio' } })
+lspconfig.sqls.setup({})
 lspconfig.terraformls.setup({})
 lspconfig.tsserver.setup({})
 lspconfig.vimls.setup({})
@@ -439,8 +399,8 @@ lspconfig.zls.setup({})
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
-    print('LSP Attached')
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = args.buf })
+    vim.keymap.set('n', 'ga', vim.lsp.buf.code_action, { buffer = args.buf })
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf })
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = args.buf })
     vim.keymap.set('n', 'gm', vim.lsp.buf.implementation, { buffer = args.buf })
@@ -454,8 +414,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- Built-in plugin configuration {{{
 vim.g.html_indent_inctags = 'p'
 -- }}}
--- vim-autoclose configuration {{{
-vim.g.AutoCloseExpandSpace = 0 -- Make iabbrev work again
+-- nvim-treesitter configuration {{{
+require('nvim-treesitter.configs').setup({
+  auto_install = true,
+  highlight = {
+    enable = true
+  }
+})
 -- }}}
 -- vim-hexokinase configuration {{{
 vim.g.Hexokinase_virtualText = '███'
@@ -464,7 +429,7 @@ vim.g.Hexokinase_v2 = 0
 -- fzf.vim configuration {{{
 vim.api.nvim_create_user_command(
   'RgIgnoreFilename',
-  function (opts)
+  function(opts)
     local spec = vim.fn['fzf#vim#with_preview']()
     spec.options = { '--delimiter', ':', '--nth', 4, unpack(spec.options) }
     vim.fn['fzf#vim#grep'](
@@ -473,23 +438,25 @@ vim.api.nvim_create_user_command(
       opts.bang and 1 or 0
     )
   end,
-  { nargs = '*', bang = true}
+  { nargs = '*', bang = true }
 )
 vim.api.nvim_create_user_command(
   'RgIgnoreTests',
-  function (opts)
+  function(opts)
     local spec = vim.fn['fzf#vim#with_preview']()
     spec.options = { '--delimiter', ':', '--nth', 4, unpack(spec.options) }
     vim.fn['fzf#vim#grep'](
-      'rg --column --line-number --no-heading --color=always --smart-case --glob !test/ --glob !spec/ -- ' .. vim.fn.shellescape(opts.args),
+      'rg --column --line-number --no-heading --color=always --smart-case --glob !test/ --glob !spec/ -- ' ..
+      vim.fn.shellescape(opts.args),
       spec,
       opts.bang and 1 or 0
     )
   end,
-  { nargs = '*', bang = true}
+  { nargs = '*', bang = true }
 )
 vim.keymap.set('n', '<leader>a', function() vim.cmd('Rg') end)
 vim.keymap.set('n', '<leader>e', function() vim.cmd('RgIgnoreFilename') end)
+vim.keymap.set('n', '<leader>t', function() vim.cmd('RgIgnoreTests') end)
 vim.keymap.set('n', '<leader>b', function() vim.cmd('Buffers') end)
 vim.keymap.set('n', '<C-N>', function() vim.cmd('Lines') end)
 vim.keymap.set('n', '<C-P>', function() vim.cmd('Files') end)
@@ -499,25 +466,26 @@ vim.g.targets_argOpening = '[({[]'
 vim.g.targets_argClosing = '[]})]'
 -- }}}
 -- vim-easy-align configuration {{{
-vim.keymap.set({'n', 'x'}, 'ga', '<Plug>(EasyAlign)')
+vim.keymap.set({ 'n', 'x' }, 'ga', '<Plug>(EasyAlign)')
+vim.keymap.set({ 'v' }, '<Enter>', '<Plug>(EasyAlign)')
 vim.g.easy_align_delimiters = {
   [';'] = { pattern = ':', left_margin = 1, right_margin = 0 }
 }
 -- }}}
 -- vim-fugitive configuration {{{
-vim.keymap.set({'n'}, 'gw', function() vim.cmd('Gwrite') end)
-vim.keymap.set({'n'}, 'gs', function() vim.cmd('G status') end)
-vim.keymap.set({'n'}, 'gc', function() vim.cmd('G commit -v') end)
-vim.keymap.set({'n'}, 'gp', function() vim.cmd('G push') end)
-vim.keymap.set({'n'}, 'gfp', function() vim.cmd('G push -f') end)
-vim.keymap.set({'n'}, 'gy', function() vim.cmd('GBrowse!') end)
-vim.keymap.set({'v'}, 'gy', function() vim.cmd('\'<\'>GBrowse!') end)
+vim.keymap.set({ 'n' }, 'gw', function() vim.cmd('Gwrite') end)
+vim.keymap.set({ 'n' }, 'gs', function() vim.cmd('G status') end)
+vim.keymap.set({ 'n' }, 'gc', function() vim.cmd('G commit -v') end)
+vim.keymap.set({ 'n' }, 'gp', function() vim.cmd('G push') end)
+vim.keymap.set({ 'n' }, 'gfp', function() vim.cmd('G push -f') end)
+vim.keymap.set({ 'n' }, 'gy', function() vim.cmd('GBrowse!') end)
+vim.keymap.set({ 'v' }, 'gy', function() vim.cmd('\'<\'>GBrowse!') end)
 -- }}}
 -- vim-test configuration {{{
 vim.g['test#strategy'] = 'vimux'
-vim.keymap.set({'n'}, '<leader>tn', function() vim.cmd('TestNearest') end)
-vim.keymap.set({'n'}, '<leader>tl', function() vim.cmd('TestLast') end)
-vim.keymap.set({'n'}, '<leader>tf', function() vim.cmd('TestFile') end)
+vim.keymap.set({ 'n' }, '<leader>tn', function() vim.cmd('TestNearest') end)
+vim.keymap.set({ 'n' }, '<leader>tl', function() vim.cmd('TestLast') end)
+vim.keymap.set({ 'n' }, '<leader>tf', function() vim.cmd('TestFile') end)
 -- }}}
 -- vimux configuration {{{
 vim.g.VimuxUseNearest = 1
@@ -537,22 +505,43 @@ if TMUX ~= '' then
   }
   vim.g.slime_target = 'tmux'
   vim.g.slime_no_mappings = 1
-  vim.keymap.set({'x'}, '<c-s><c-s>', '<Plug>SlimeRegionSend')
-  vim.keymap.set({'n'}, '<c-s><c-s>', '<Plug>SlimeParagraphSend')
-  vim.keymap.set({'n'}, '<c-s>v', '<Plug>SlimeConfigSend')
+  vim.keymap.set({ 'x' }, '<c-s><c-s>', '<Plug>SlimeRegionSend')
+  vim.keymap.set({ 'n' }, '<c-s><c-s>', '<Plug>SlimeParagraphSend')
+  vim.keymap.set({ 'n' }, '<c-s>v', '<Plug>SlimeConfigSend')
 end
 -- }}}
 -- LuaSnip configuration {{{
 local ls = require("luasnip")
-vim.keymap.set({"i"}, "<Tab>", function() ls.expand() end, {silent = true})
-vim.keymap.set({"i", "s"}, "<Tab>", function() ls.jump( 1) end, {silent = true})
-vim.keymap.set({"i", "s"}, "<S-Tab>", function() ls.jump(-1) end, {silent = true})
+-- vim.keymap.set({"i"}, "<Tab>", function()
+--   if vim.fn.pumvisible() == 1 then
+--     ls.expand()
+--     return
+--   else
+--     return "<Tab>"
+--   end
+-- end, {silent = true, expr = true })
+vim.keymap.set({ "i", "s" }, "<Tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    ls.jump(1)
+    return
+  else
+    return "<Tab>"
+  end
+end, { silent = true, expr = true })
+vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    ls.jump(-1)
+    return
+  else
+    return "<Tab>"
+  end
+end, { silent = true, expr = true })
 
-vim.keymap.set({"i", "s"}, "<C-E>", function()
-	if ls.choice_active() then
-		ls.change_choice(1)
-	end
-end, {silent = true})
+vim.keymap.set({ "i", "s" }, "<C-E>", function()
+  if ls.choice_active() then
+    ls.change_choice(1)
+  end
+end, { silent = true })
 require("luasnip.loaders.from_vscode").lazy_load()
 -- }}}
 -- nvim-cmp configuration {{{
@@ -610,9 +599,6 @@ vim.g.rails_projections = {
   ['*.spec.jsx'] = { alternate = { '{}.tsx', '{}.jsx' } },
   ['*.spec.tsx'] = { alternate = { '{}.tsx', '{}.jsx' } },
 }
--- }}}
--- vim-markdown configuration {{{
-vim.g.markdown_fenced_languages = { 'html', 'ruby', 'bash=sh' }
 -- }}}
 -- }}}
 -- vim:foldmethod=marker

@@ -9,7 +9,6 @@
     ~/Brewfile: Brewfile
     ~/Brewfile.lock.json: Brewfile.lock.json
     "~/Library/Application Support/nushell/": nushell
-    ~/.config/nvim/init.vim: .nvimrc
     ~/.config/kitty/kitty.conf: .config/kitty/kitty.conf
     ~/.dotfiles: ''
     ~/.promptline_git_status.sh: .promptline_git_status.sh
@@ -27,10 +26,14 @@
     command: brew bundle
     stdout: true
     stderr: true
-  - [rustup install]
+  - ["rustup update || curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh"]
   - [cargo install tealdeer]
   - [cargo install cargo-watch]
   - [cargo install cargo-expand]
   - [cargo install feel]
 - npm:
   - 'bash-language-server'
+  - 'typescript-language-server'
+  - 'vscode-langservers-extracted'
+  - 'cssmodules-language-server'
+  - 'http-server'
