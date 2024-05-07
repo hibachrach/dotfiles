@@ -24,11 +24,10 @@ brew 'git-absorb' # Automatically identify and merge `--fixup` changes
 brew 'mkcert' # Easily create local TLS certificates 
 
 cask 'alfred'
-cask '1password'
+cask 'kitty'
 cask 'spotify'
 cask 'discord'
 cask 'notion'
-cask 'google-chrome'
 cask 'messenger'
 cask 'zoom'
 cask 'omnifocus'
