@@ -22,6 +22,8 @@
       force: true
       path: .zshrc
 - shell:
+  - ['brew --version || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"']
+  - ["rustup update || curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh"]
   - 
     command: brew bundle
     stdout: true
