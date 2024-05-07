@@ -1,0 +1,6 @@
+[[language]]
+name = "json"
+formatter = { command = "prettier", args = ["--parser", "json"] }
+
+[language-server.solargraph]
+timeout = 40
