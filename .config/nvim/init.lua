@@ -20,8 +20,6 @@ require("lazy").setup(
     -- Enforcing sane behavior
     'tpope/vim-repeat',                -- Make `.` work like it should
     'tpope/vim-endwise',               -- Automatically add `end` when in Ruby
-    -- 'Townk/vim-autoclose',             -- Automatic closure of parens, braces, and brackets
-    { dir = '~/personal/traces.vim' }, -- Highlight patterns and ranges for Ex-commands
 
     -- UI - Plugins that don't *do* anything but display information
     'junegunn/vim-peekaboo', -- To see vim register contents during reg access
@@ -37,7 +35,7 @@ require("lazy").setup(
     -- File Navigation
     {
       "junegunn/fzf",
-      dir = "~/.fzf",
+      name = "fzf",
       build = "./install --all"
     },
     'junegunn/fzf.vim', -- Fuzzy file search (hooked up to C-P for me)
@@ -46,6 +44,7 @@ require("lazy").setup(
     -- Editor Keybindings/Motions
     'tpope/vim-unimpaired',      -- Pairs of useful keymappings
     'tpope/vim-commentary',      -- Easily (un)comment lines or blocks
+    'tpope/vim-projectionist',   -- Switch easily between tests and their subjects
     'wellle/targets.vim',        -- Add additional text objects and related goodies
     'junegunn/vim-easy-align',   -- To easily align repeating structures
     'tpope/vim-surround',        -- Easily add surrounding characters to text objects
@@ -55,39 +54,44 @@ require("lazy").setup(
     -- Advanced text manipulation
     'tpope/vim-abolish', -- Case-smart replacement; case coercion
     'chrisbra/unicode.vim',
+    'andymass/vim-matchup',
 
     -- Interfaces
     'tpope/vim-eunuch',               -- Adds nice Unix shortcuts to Vim
     'tpope/vim-fugitive',             -- Git wrapper for vim
     'tpope/vim-rhubarb',              -- Enable vim-fugitive to browse stuff on GitHub
-    'junegunn/gv.vim',                -- Enable easy git log browsing
     'janko-m/vim-test',               -- Running tests in vim
     'benmills/vimux',                 -- Send commands to tmux panes from vim; used in vim-test
     'airblade/vim-gitgutter',         -- Show changes in the left gutter; stage individual hunks
     'christoomey/vim-tmux-navigator', -- Enables vim-tmux nav with C-h/j/k/l keys
     'jpalardy/vim-slime',             -- Send commands over to another tmux pane!
 
-    {
-      dir = '~/personal/programming/forks/vim-github-codeowners',
-      build = 'npm install'
-    },
+    -- {
+    --   dir = '~/personal/programming/forks/vim-github-codeowners',
+    --   build = 'npm install'
+    -- },
 
     -- Autocompletion
     'neovim/nvim-lspconfig',
+    'zbirenbaum/copilot.lua',
+    'hrsh7th/nvim-cmp',
     'hrsh7th/cmp-nvim-lsp',
     'hrsh7th/cmp-buffer',
     'hrsh7th/cmp-path',
     'hrsh7th/cmp-cmdline',
     'saadparwaiz1/cmp_luasnip',
-    'jose-elias-alvarez/null-ls.nvim',
     {
       "L3MON4D3/LuaSnip",
       version = "v2.*",
       build = "make install_jsregexp",
       dependencies = { "rafamadriz/friendly-snippets" },
     },
-    'hrsh7th/nvim-cmp',
-    -- 'folke/neodev.nvim',
+    {
+      'zbirenbaum/copilot-cmp',
+      config = function ()
+        -- require("copilot_cmp").setup()
+      end
+    },
 
     -- Not for Vim - Plugins that don't have anything to do with vim (weird, right?)
     'edkolev/tmuxline.vim',   -- Customize tmux status bar in .vimrc
@@ -146,6 +150,10 @@ vim.opt.cursorline = true                         -- Highlight the line the curs
 vim.opt.ignorecase = true                         -- Ignore case when searching
 vim.opt.smartcase = true                          -- Add case sensitivity if any capital letters; requires ignorecase
 vim.opt.showmode = true                           -- Don't show the mode (INSERT, VISUAL, etc.) on the last line
+vim.opt.foldmethod = "expr"                       -- Use `vim.opt.foldexpr` to determine how to fold
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Use treesitter for code fold info
+vim.opt.foldtext = ""                             -- Just show line w/o other changes to styling
+vim.opt.foldlevel = 99                            -- Don't fold anything by default
 vim.opt.splitright = true                         -- So new splits open on the right
 vim.opt.undofile = true                           -- Keep undos in a file
 vim.opt.undodir = vim.fn.expand('~/.vim/undodir') -- Sets undo file director
@@ -207,7 +215,7 @@ end
 
 BuildStatusline = function()
   local vim_mode = currentmode[vim.fn.mode()] or '?'
-  local codeowner = vim.fn['codeowners#who'](vim.api.nvim_buf_get_name(0))
+  -- local codeowner = vim.fn['codeowners#who'](vim.api.nvim_buf_get_name(0))
   local relative_path = vim.fn.expand('%:~:.')
   local parts = {
     '[',
@@ -222,7 +230,7 @@ BuildStatusline = function()
     '%m',          -- modifiable flag
     '%r',          -- read only flag
     '[',
-    codeowner,
+    -- codeowner,
     ']',
     '%=',    -- alignment break
     '%y',    -- filetype
@@ -273,9 +281,6 @@ vim.keymap.set('n', '<leader>h', function() vim.cmd('bprevious') end)
 vim.keymap.set('n', '<leader>ve', function() vim.cmd('vsplit $MYVIMRC') end)
 vim.keymap.set('n', '<leader>vs', function() vim.cmd('source $MYVIMRC') end)
 vim.keymap.set('n', '<leader>ze', function() vim.cmd('vsplit ~/.zshrc') end)
-
--- Enable folding
-vim.keymap.set('n', '<leader>f', function() vim.opt.foldmethod = 'syntax' end)
 
 -- Copy filename to system clipboard
 vim.keymap.set(
@@ -366,7 +371,7 @@ end, { silent = true })
 local filetype_ruby_augroup = vim.api.nvim_create_augroup('filetype_ruby', { clear = true })
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
   pattern = { "*.rb" },
-  command = 'iabbrev dbp Rails.logger.info("##### DEBUG #{}")<Left><Left><Left>',
+  command = 'iabbrev dbp Rails.logger.info(hazel_debug: true, )<Left>',
   group = filetype_ruby_augroup
 })
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
@@ -382,19 +387,30 @@ lspconfig.bashls.setup({})
 lspconfig.clangd.setup({})
 lspconfig.cssls.setup({})
 lspconfig.cssmodules_ls.setup({})
+lspconfig.elixirls.setup({ cmd = { "elixirls" }})
 lspconfig.eslint.setup({})
+lspconfig.elp.setup({})
 lspconfig.gleam.setup({})
+lspconfig.gopls.setup({
+  on_attach = function(client, bufnr)
+    -- Clear out `gofmt` so gq still wraps comments
+    vim.opt.formatprg = ""
+  end
+})
+lspconfig.graphql.setup({})
 lspconfig.html.setup({})
 lspconfig.jsonls.setup({})
 lspconfig.lua_ls.setup({})
 lspconfig.nushell.setup({})
+lspconfig.ocamllsp.setup({})
 lspconfig.pyright.setup({})
 lspconfig.rust_analyzer.setup({})
 lspconfig.solargraph.setup({ cmd = { 'bundle', 'exec', 'solargraph', 'stdio' } })
 lspconfig.sqls.setup({})
 lspconfig.terraformls.setup({})
-lspconfig.tsserver.setup({})
+lspconfig.ts_ls.setup({})
 lspconfig.vimls.setup({})
+lspconfig.yamlls.setup({})
 lspconfig.zls.setup({})
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -419,8 +435,26 @@ require('nvim-treesitter.configs').setup({
   auto_install = true,
   highlight = {
     enable = true
+  },
+  matchup = {
+    enable = true
   }
 })
+vim.treesitter.query.set("ruby", "folds", [[
+  [
+    (method)
+    (singleton_method)
+    (class)
+    (module)
+    (if)
+    (else)
+    (case)
+    (do_block)
+    (singleton_class)
+    (lambda)
+    (hash)
+  ] @fold
+]])
 -- }}}
 -- vim-hexokinase configuration {{{
 vim.g.Hexokinase_virtualText = '███'
@@ -474,7 +508,6 @@ vim.g.easy_align_delimiters = {
 -- }}}
 -- vim-fugitive configuration {{{
 vim.keymap.set({ 'n' }, 'gw', function() vim.cmd('Gwrite') end)
-vim.keymap.set({ 'n' }, 'gs', function() vim.cmd('G status') end)
 vim.keymap.set({ 'n' }, 'gc', function() vim.cmd('G commit -v') end)
 vim.keymap.set({ 'n' }, 'gp', function() vim.cmd('G push') end)
 vim.keymap.set({ 'n' }, 'gfp', function() vim.cmd('G push -f') end)
@@ -544,13 +577,29 @@ vim.keymap.set({ "i", "s" }, "<C-E>", function()
 end, { silent = true })
 require("luasnip.loaders.from_vscode").lazy_load()
 -- }}}
+-- copilot.lua configuration {{{
+require("copilot").setup({
+  suggestion = { enabled = false },
+  panel = { enabled = false }
+})
+-- }}}
 -- nvim-cmp configuration {{{
 local cmp = require('cmp')
 
+local has_words_before = function()
+  if vim.api.nvim_buf_get_option(0, 'buftype') == 'prompt' then
+    return false
+  end
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_text(0, line-1, 0, line-1, col, {})[1]:match("^%s*$") == nil
+end
+
 cmp.setup({
   sources = cmp.config.sources({
+      { name = 'copilot' },
       { name = 'nvim_lsp' },
       { name = 'luasnip' },
+      { name = 'path' },
     },
     {
       { name = 'buffer' },
@@ -561,9 +610,11 @@ cmp.setup({
       require('luasnip').lsp_expand(args.body)
     end
   },
-  mapping = cmp.mapping.preset.insert({
-    ['<Tab>'] = cmp.mapping.confirm({ select = true })
-  })
+  mapping = {
+    ['<C-N>'] = cmp.mapping.select_next_item(),
+    ['<C-P>'] = cmp.mapping.select_prev_item(),
+    ['<Tab>'] = cmp.mapping.confirm(),
+  }
 })
 -- }}}
 -- tmuxline configuration {{{
@@ -598,6 +649,8 @@ vim.g.rails_projections = {
   ['*.spec.ts'] = { alternate = { '{}.ts' } },
   ['*.spec.jsx'] = { alternate = { '{}.tsx', '{}.jsx' } },
   ['*.spec.tsx'] = { alternate = { '{}.tsx', '{}.jsx' } },
+  -- ['*_test.go'] = { alternate = { '{}.go' } },
+  -- ['*.go'] = { alternate = { '{}_test.go' } },
 }
 -- }}}
 -- }}}
